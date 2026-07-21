@@ -68,7 +68,6 @@ export function marinaPhoto(seed: number): string {
     const scale = 0.55 + rnd() * 0.75;
     boats.push(sailboat(x, waterY + 8 + rnd() * 40, scale, p));
   }
-  boats.sort(() => 0); // deterministic order
 
   const waves: string[] = [];
   for (let i = 0; i < 9; i++) {

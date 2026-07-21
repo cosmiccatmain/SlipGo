@@ -1,21 +1,24 @@
 export type ListingType = "marina" | "yacht-club" | "guest-dock";
+export type ListingMode = "rent" | "sale";
 
 export interface Listing {
   id: string;
   name: string;
   type: ListingType;
+  /** "rent" (slip rentals / dues / guest docks) or "sale" (deeded slips for sale) */
+  mode: ListingMode;
   /** Big price line shown on the card, e.g. "$795/mo" */
   priceLabel: string;
   /** Short label shown inside the map pin, e.g. "$795" */
   pinLabel: string;
-  /** Normalized monthly dollars used for price filtering + sorting */
+  /** Normalized dollars used for price filtering, sorting + the estimate */
   sortPrice: number;
   address: string;
   lat: number;
   lon: number;
   maxLengthFt: number;
   slipsOpen: number;
-  /** Middle spec, e.g. "$19.50/ft" or "Dues + initiation" */
+  /** Middle spec, e.g. "$19.50/ft" or "Members only" */
   rateNote: string;
   /** Trailing spec chip, e.g. "Liveaboard OK" */
   perk: string;
@@ -23,15 +26,36 @@ export interface Listing {
   attribution: string;
   /** Index into the photo palette rotation */
   photoSeed: number;
+  /** Sample star rating (illustrative MVP data) */
+  rating: number;
+  /** Sample review count (illustrative MVP data) */
+  reviewCount: number;
+  /** Amenity tags — power the "More" filter and the value estimate */
+  amenities: string[];
 }
+
+// Amenity vocabulary surfaced in the "More" filter.
+export const AMENITY_OPTIONS = [
+  "Liveaboard OK",
+  "Fuel dock",
+  "Guest dock",
+  "Dry storage",
+  "Concrete docks",
+  "WaterBus stop",
+  "Gated docks",
+  "Pump-out",
+  "Club amenities",
+  "Parking",
+] as const;
 
 // Coordinates are placed inside the real Marina del Rey basins
 // (extracted from an OpenStreetMap export of the harbor).
-export const listings: Listing[] = [
+export const rentListings: Listing[] = [
   {
     id: "esprit",
     name: "Esprit Marina del Rey",
     type: "marina",
+    mode: "rent",
     priceLabel: "$1,150/mo",
     pinLabel: "$1,150",
     sortPrice: 1150,
@@ -44,11 +68,15 @@ export const listings: Listing[] = [
     perk: "Concrete docks",
     attribution: "ESPRIT RESIDENCES & MARINA",
     photoSeed: 0,
+    rating: 4.7,
+    reviewCount: 214,
+    amenities: ["Concrete docks", "Liveaboard OK", "Parking", "Pump-out"],
   },
   {
     id: "neptune",
     name: "Neptune Marina",
     type: "marina",
+    mode: "rent",
     priceLabel: "$795/mo",
     pinLabel: "$795",
     sortPrice: 795,
@@ -61,11 +89,15 @@ export const listings: Listing[] = [
     perk: "Liveaboard OK",
     attribution: "NEPTUNE MARINA ANCHORAGE",
     photoSeed: 1,
+    rating: 4.4,
+    reviewCount: 156,
+    amenities: ["Liveaboard OK", "Parking"],
   },
   {
     id: "dolphin",
     name: "Dolphin Marina",
     type: "marina",
+    mode: "rent",
     priceLabel: "$698/mo",
     pinLabel: "$698",
     sortPrice: 698,
@@ -78,11 +110,15 @@ export const listings: Listing[] = [
     perk: "WaterBus stop",
     attribution: "DOLPHIN MARINA",
     photoSeed: 2,
+    rating: 4.5,
+    reviewCount: 98,
+    amenities: ["WaterBus stop", "Parking", "Pump-out"],
   },
   {
     id: "holiday-harbor",
     name: "Holiday Harbor Marina",
     type: "marina",
+    mode: "rent",
     priceLabel: "$525/mo",
     pinLabel: "$525",
     sortPrice: 525,
@@ -95,11 +131,15 @@ export const listings: Listing[] = [
     perk: "Dry storage",
     attribution: "HOLIDAY HARBOR",
     photoSeed: 3,
+    rating: 4.0,
+    reviewCount: 42,
+    amenities: ["Dry storage", "Parking"],
   },
   {
     id: "tahiti",
     name: "Tahiti Marina",
     type: "marina",
+    mode: "rent",
     priceLabel: "$640/mo",
     pinLabel: "$640",
     sortPrice: 640,
@@ -112,11 +152,15 @@ export const listings: Listing[] = [
     perk: "Kayak racks",
     attribution: "TAHITI MARINA APARTMENTS & SLIPS",
     photoSeed: 4,
+    rating: 4.2,
+    reviewCount: 73,
+    amenities: ["Parking"],
   },
   {
     id: "bar-harbor",
     name: "Bar Harbor Marina",
     type: "marina",
+    mode: "rent",
     priceLabel: "$580/mo",
     pinLabel: "$580",
     sortPrice: 580,
@@ -129,11 +173,15 @@ export const listings: Listing[] = [
     perk: "Gated docks",
     attribution: "BAR HARBOR MARINA",
     photoSeed: 5,
+    rating: 4.1,
+    reviewCount: 51,
+    amenities: ["Gated docks", "Parking"],
   },
   {
     id: "marina-harbor",
     name: "Marina Harbor Anchorage",
     type: "marina",
+    mode: "rent",
     priceLabel: "$720/mo",
     pinLabel: "$720",
     sortPrice: 720,
@@ -146,11 +194,15 @@ export const listings: Listing[] = [
     perk: "Turning basin",
     attribution: "MARINA HARBOR",
     photoSeed: 0,
+    rating: 4.6,
+    reviewCount: 187,
+    amenities: ["Concrete docks", "Gated docks", "Parking", "Pump-out"],
   },
   {
     id: "pier-44",
     name: "Pier 44 Marina",
     type: "marina",
+    mode: "rent",
     priceLabel: "$1,275/mo",
     pinLabel: "$1,275",
     sortPrice: 1275,
@@ -163,11 +215,15 @@ export const listings: Listing[] = [
     perk: "New docks · 2023",
     attribution: "PIER 44 / PACIFIC MARINE VENTURES",
     photoSeed: 1,
+    rating: 4.8,
+    reviewCount: 132,
+    amenities: ["Concrete docks", "Fuel dock", "Pump-out", "Parking"],
   },
   {
     id: "marina-city-club",
     name: "Marina City Club Marina",
     type: "marina",
+    mode: "rent",
     priceLabel: "$940/mo",
     pinLabel: "$940",
     sortPrice: 940,
@@ -180,11 +236,15 @@ export const listings: Listing[] = [
     perk: "Club amenities",
     attribution: "MARINA CITY CLUB",
     photoSeed: 2,
+    rating: 4.1,
+    reviewCount: 64,
+    amenities: ["Club amenities", "Parking"],
   },
   {
     id: "deauville",
     name: "Deauville Marina",
     type: "marina",
+    mode: "rent",
     priceLabel: "$610/mo",
     pinLabel: "$610",
     sortPrice: 610,
@@ -197,11 +257,15 @@ export const listings: Listing[] = [
     perk: "Near Chace Park",
     attribution: "DEAUVILLE MARINA",
     photoSeed: 3,
+    rating: 4.4,
+    reviewCount: 88,
+    amenities: ["Parking", "Pump-out"],
   },
   {
     id: "mdr-hotel",
     name: "Marina del Rey Hotel Guest Slips",
     type: "guest-dock",
+    mode: "rent",
     priceLabel: "$3.00/ft night",
     pinLabel: "$3/ft",
     sortPrice: 2700,
@@ -214,11 +278,15 @@ export const listings: Listing[] = [
     perk: "Hotel + pool",
     attribution: "MARINA DEL REY HOTEL",
     photoSeed: 4,
+    rating: 4.6,
+    reviewCount: 240,
+    amenities: ["Guest dock", "Fuel dock", "Parking"],
   },
   {
     id: "chace-park",
     name: "Burton Chace Park Guest Docks",
     type: "guest-dock",
+    mode: "rent",
     priceLabel: "$1.00/ft night",
     pinLabel: "$1/ft",
     sortPrice: 900,
@@ -231,11 +299,15 @@ export const listings: Listing[] = [
     perk: "7-day max stay",
     attribution: "LA COUNTY BEACHES & HARBORS",
     photoSeed: 5,
+    rating: 4.5,
+    reviewCount: 310,
+    amenities: ["Guest dock", "Pump-out", "Parking"],
   },
   {
     id: "del-rey-landing",
     name: "Del Rey Landing Fuel & Guest Dock",
     type: "guest-dock",
+    mode: "rent",
     priceLabel: "$2.50/ft night",
     pinLabel: "$2.50/ft",
     sortPrice: 2250,
@@ -248,11 +320,15 @@ export const listings: Listing[] = [
     perk: "Harbor entrance",
     attribution: "DEL REY LANDING",
     photoSeed: 0,
+    rating: 4.2,
+    reviewCount: 76,
+    amenities: ["Guest dock", "Fuel dock", "Pump-out"],
   },
   {
     id: "cyc",
     name: "California Yacht Club",
     type: "yacht-club",
+    mode: "rent",
     priceLabel: "$410/mo dues",
     pinLabel: "$410",
     sortPrice: 410,
@@ -265,11 +341,15 @@ export const listings: Listing[] = [
     perk: "Racing program",
     attribution: "CALIFORNIA YACHT CLUB · EST. 1922",
     photoSeed: 1,
+    rating: 4.7,
+    reviewCount: 189,
+    amenities: ["Club amenities", "Fuel dock", "Parking"],
   },
   {
     id: "dryc",
     name: "Del Rey Yacht Club",
     type: "yacht-club",
+    mode: "rent",
     priceLabel: "$385/mo dues",
     pinLabel: "$385",
     sortPrice: 385,
@@ -282,11 +362,15 @@ export const listings: Listing[] = [
     perk: "Reciprocal clubs",
     attribution: "DEL REY YACHT CLUB",
     photoSeed: 2,
+    rating: 3.9,
+    reviewCount: 54,
+    amenities: ["Club amenities", "Parking"],
   },
   {
     id: "pmyc",
     name: "Pacific Mariners Yacht Club",
     type: "yacht-club",
+    mode: "rent",
     priceLabel: "$98/mo dues",
     pinLabel: "$98",
     sortPrice: 98,
@@ -299,11 +383,15 @@ export const listings: Listing[] = [
     perk: "Galley + bar",
     attribution: "PACIFIC MARINERS YACHT CLUB",
     photoSeed: 3,
+    rating: 4.6,
+    reviewCount: 121,
+    amenities: ["Club amenities", "Parking"],
   },
   {
     id: "smwyc",
     name: "Santa Monica Windjammers Yacht Club",
     type: "yacht-club",
+    mode: "rent",
     priceLabel: "$72/mo dues",
     pinLabel: "$72",
     sortPrice: 72,
@@ -316,8 +404,147 @@ export const listings: Listing[] = [
     perk: "Cruise-outs",
     attribution: "SM WINDJAMMERS YACHT CLUB",
     photoSeed: 4,
+    rating: 4.4,
+    reviewCount: 67,
+    amenities: ["Club amenities"],
   },
 ];
+
+// Deeded slips for sale (the "Buy a slip" mode).
+export const saleListings: Listing[] = [
+  {
+    id: "sale-tahiti-42",
+    name: "Slip 42 · Tahiti Way",
+    type: "marina",
+    mode: "sale",
+    priceLabel: "$189,000",
+    pinLabel: "$189K",
+    sortPrice: 189000,
+    address: "13900 Tahiti Way, Marina del Rey, CA 90292",
+    lat: 33.974,
+    lon: -118.455,
+    maxLengthFt: 40,
+    slipsOpen: 1,
+    rateNote: "Deeded slip",
+    perk: "40 ft · end tie",
+    attribution: "FOR SALE · TAHITI BASIN",
+    photoSeed: 4,
+    rating: 4.3,
+    reviewCount: 12,
+    amenities: ["Concrete docks", "Parking"],
+  },
+  {
+    id: "sale-marquesas-63",
+    name: "Slip 63 · Marquesas Way",
+    type: "marina",
+    mode: "sale",
+    priceLabel: "$259,000",
+    pinLabel: "$259K",
+    sortPrice: 259000,
+    address: "13800 Marquesas Way, Marina del Rey, CA 90292",
+    lat: 33.976,
+    lon: -118.4535,
+    maxLengthFt: 45,
+    slipsOpen: 1,
+    rateNote: "Deeded slip",
+    perk: "45 ft",
+    attribution: "FOR SALE · MARQUESAS BASIN",
+    photoSeed: 5,
+    rating: 4.1,
+    reviewCount: 9,
+    amenities: ["Parking"],
+  },
+  {
+    id: "sale-borabora-118",
+    name: "Slip 118 · Bora Bora Basin",
+    type: "marina",
+    mode: "sale",
+    priceLabel: "$329,000",
+    pinLabel: "$329K",
+    sortPrice: 329000,
+    address: "13500 Bora Bora Way, Marina del Rey, CA 90292",
+    lat: 33.9722,
+    lon: -118.454,
+    maxLengthFt: 55,
+    slipsOpen: 1,
+    rateNote: "Deeded slip",
+    perk: "55 ft · liveaboard",
+    attribution: "FOR SALE · BORA BORA BASIN",
+    photoSeed: 2,
+    rating: 4.5,
+    reviewCount: 8,
+    amenities: ["Liveaboard OK", "Concrete docks", "Parking"],
+  },
+  {
+    id: "sale-panay-155",
+    name: "Slip 155 · Panay Way",
+    type: "marina",
+    mode: "sale",
+    priceLabel: "$432,000",
+    pinLabel: "$432K",
+    sortPrice: 432000,
+    address: "13700 Panay Way, Marina del Rey, CA 90292",
+    lat: 33.979,
+    lon: -118.4548,
+    maxLengthFt: 60,
+    slipsOpen: 1,
+    rateNote: "Deeded slip",
+    perk: "60 ft",
+    attribution: "FOR SALE · PANAY BASIN",
+    photoSeed: 0,
+    rating: 4.4,
+    reviewCount: 11,
+    amenities: ["Concrete docks", "Parking"],
+  },
+  {
+    id: "sale-admiralty-7",
+    name: "Slip 7 · Admiralty",
+    type: "marina",
+    mode: "sale",
+    priceLabel: "$585,000",
+    pinLabel: "$585K",
+    sortPrice: 585000,
+    address: "4400 Admiralty Way, Marina del Rey, CA 90292",
+    lat: 33.9815,
+    lon: -118.447,
+    maxLengthFt: 75,
+    slipsOpen: 1,
+    rateNote: "Deeded slip",
+    perk: "75 ft · fuel nearby",
+    attribution: "FOR SALE · ADMIRALTY BASIN",
+    photoSeed: 3,
+    rating: 4.6,
+    reviewCount: 15,
+    amenities: ["Concrete docks", "Fuel dock", "Parking"],
+  },
+  {
+    id: "sale-fiji-200",
+    name: "Slip 200 · Fiji Way",
+    type: "marina",
+    mode: "sale",
+    priceLabel: "$925,000",
+    pinLabel: "$925K",
+    sortPrice: 925000,
+    address: "13600 Fiji Way, Marina del Rey, CA 90292",
+    lat: 33.9745,
+    lon: -118.445,
+    maxLengthFt: 110,
+    slipsOpen: 1,
+    rateNote: "Deeded slip",
+    perk: "110 ft · end tie",
+    attribution: "FOR SALE · FIJI BASIN",
+    photoSeed: 1,
+    rating: 4.8,
+    reviewCount: 6,
+    amenities: ["Concrete docks", "Pump-out", "Parking"],
+  },
+];
+
+/** Every listing across modes — used to calibrate the value estimate. */
+export const allListings: Listing[] = [...rentListings, ...saleListings];
+
+// Back-compat default export used by the rent view.
+export const listings = rentListings;
 
 export interface MarinaEvent {
   id: string;
@@ -363,9 +590,4 @@ export const events: MarinaEvent[] = [
     title: "Holiday Boat Parade",
     detail: "Main channel · 5:55 PM · 60+ boats",
   },
-];
-
-export const MAP_BOUNDS: [[number, number], [number, number]] = [
-  [33.9635, -118.4595],
-  [33.986, -118.4395],
 ];

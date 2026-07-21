@@ -1,9 +1,11 @@
 import { useState } from "react";
 import type { Listing } from "../data/listings";
 import { marinaPhoto } from "../lib/photos";
+import { getEstimate, formatEstimate } from "../lib/estimate";
 
 interface Props {
   listing: Listing;
+  index: number;
   selected: boolean;
   onHover: (id: string | null) => void;
   onSelect: (id: string) => void;
@@ -15,12 +17,23 @@ const TYPE_BADGE: Record<Listing["type"], string | null> = {
   "yacht-club": "Yacht club",
 };
 
-export function ListingCard({ listing, selected, onHover, onSelect }: Props) {
+export function ListingCard({ listing, index, selected, onHover, onSelect }: Props) {
   const [liked, setLiked] = useState(false);
-  const badge = TYPE_BADGE[listing.type];
+  const badge = listing.mode === "sale" ? "For sale" : TYPE_BADGE[listing.type];
+  const badgeClass = listing.mode === "sale" ? "sale" : listing.type;
+  const est = getEstimate(listing);
 
-  const specs =
-    listing.type === "yacht-club" ? (
+  let specs: React.ReactNode;
+  if (listing.mode === "sale") {
+    specs = (
+      <>
+        <span><b>{listing.maxLengthFt} ft</b> deeded slip</span>
+        <span className="spec-sep">|</span>
+        <span>{listing.perk}</span>
+      </>
+    );
+  } else if (listing.type === "yacht-club") {
+    specs = (
       <>
         <span><b>{listing.maxLengthFt} ft</b> max LOA</span>
         <span className="spec-sep">|</span>
@@ -28,7 +41,9 @@ export function ListingCard({ listing, selected, onHover, onSelect }: Props) {
         <span className="spec-sep">|</span>
         <span>{listing.perk}</span>
       </>
-    ) : (
+    );
+  } else {
+    specs = (
       <>
         <span><b>{listing.slipsOpen}</b> slips open</span>
         <span className="spec-sep">|</span>
@@ -37,17 +52,19 @@ export function ListingCard({ listing, selected, onHover, onSelect }: Props) {
         <span>{listing.rateNote}</span>
       </>
     );
+  }
 
   return (
     <article
-      className={"card" + (selected ? " selected" : "")}
+      className={"card card-enter" + (selected ? " selected" : "")}
+      style={{ animationDelay: `${Math.min(index, 11) * 45}ms` }}
       onMouseEnter={() => onHover(listing.id)}
       onMouseLeave={() => onHover(null)}
       onClick={() => onSelect(listing.id)}
     >
       <div className="card-photo">
         <img src={marinaPhoto(listing.photoSeed)} alt={listing.name} loading="lazy" />
-        {badge && <span className={"card-badge " + listing.type}>{badge}</span>}
+        {badge && <span className={"card-badge " + badgeClass}>{badge}</span>}
         <button
           className={"heart" + (liked ? " liked" : "")}
           aria-label="Save listing"
@@ -65,10 +82,21 @@ export function ListingCard({ listing, selected, onHover, onSelect }: Props) {
         </div>
       </div>
       <div className="card-body">
-        <div className="card-price">{listing.priceLabel}</div>
+        <div className="card-price-row">
+          <span className="card-price">{listing.priceLabel}</span>
+          <span className="card-rating" title={`${listing.reviewCount} reviews`}>
+            <span className="star" aria-hidden="true">★</span>
+            {listing.rating.toFixed(1)}
+            <span className="rating-count">({listing.reviewCount})</span>
+          </span>
+        </div>
         <div className="card-specs">{specs}</div>
         <div className="card-address">{listing.address}</div>
-        <div className="card-attribution">{listing.attribution}</div>
+        <div className="card-estimate">
+          <span className="est-label">Est.</span>
+          <span className="est-value">{formatEstimate(listing, est.fairValue)}</span>
+          <span className={"value-chip " + est.verdict}>{est.label}</span>
+        </div>
       </div>
     </article>
   );

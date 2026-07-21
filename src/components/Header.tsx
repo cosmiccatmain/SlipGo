@@ -1,7 +1,23 @@
 import { useEffect, useRef, useState } from "react";
 import { events } from "../data/listings";
 
-export function Header() {
+export type NavKey = "rent" | "buy" | "guest" | "yacht";
+
+interface Props {
+  activeNav: NavKey;
+  onNav: (key: NavKey) => void;
+  onSignIn: () => void;
+  onToast: (msg: string) => void;
+}
+
+const NAV_ITEMS: { key: NavKey; label: string }[] = [
+  { key: "rent", label: "Rent a slip" },
+  { key: "buy", label: "Buy a slip" },
+  { key: "guest", label: "Guest docks" },
+  { key: "yacht", label: "Yacht clubs" },
+];
+
+export function Header({ activeNav, onNav, onSignIn, onToast }: Props) {
   const [eventsOpen, setEventsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -19,19 +35,24 @@ export function Header() {
   return (
     <header className="header">
       <nav className="header-side header-left">
-        <a className="nav-link active" href="#">Rent a slip</a>
-        <a className="nav-link" href="#">Buy a slip</a>
-        <a className="nav-link" href="#">Guest docks</a>
-        <a className="nav-link" href="#">Yacht clubs</a>
+        {NAV_ITEMS.map((item) => (
+          <button
+            key={item.key}
+            className={"nav-link" + (activeNav === item.key ? " active" : "")}
+            onClick={() => onNav(item.key)}
+          >
+            {item.label}
+          </button>
+        ))}
         <div className="nav-menu" ref={menuRef}>
           <button
             className={"nav-link nav-button" + (eventsOpen ? " open" : "")}
             onClick={() => setEventsOpen((o) => !o)}
           >
-            Events
+            Events <span className="chev">▾</span>
           </button>
           {eventsOpen && (
-            <div className="events-menu">
+            <div className="events-menu pop-enter">
               <div className="events-menu-title">On the water in Marina del Rey</div>
               {events.map((ev) => (
                 <div className="event-row" key={ev.id}>
@@ -50,16 +71,26 @@ export function Header() {
         </div>
       </nav>
 
-      <a className="logo" href="#" aria-label="BoatGoat home">
-        <span className="logo-goat" aria-hidden="true">🐐</span>
-        <span className="logo-word">BoatGoat</span>
-      </a>
+      <button className="logo" onClick={() => onNav("rent")} aria-label="BoatGoat home">
+        <img src="/logo-mark.png" alt="" className="logo-mark" />
+        <span className="logo-word">
+          <span className="logo-boat">Boat</span><span className="logo-goat-word">Goat</span>
+        </span>
+      </button>
 
       <nav className="header-side header-right">
-        <a className="nav-link" href="#">List your marina</a>
-        <a className="nav-link" href="#">Boat loans</a>
-        <a className="nav-link" href="#">Help</a>
-        <a className="nav-link signin" href="#">Sign in</a>
+        <button className="nav-link" onClick={() => onToast("Listing tools are coming soon.")}>
+          List your marina
+        </button>
+        <button className="nav-link" onClick={() => onToast("Boat loans are coming soon.")}>
+          Boat loans
+        </button>
+        <button className="nav-link" onClick={() => onToast("Help center is coming soon.")}>
+          Help
+        </button>
+        <button className="nav-link signin" onClick={onSignIn}>
+          Sign in
+        </button>
       </nav>
     </header>
   );

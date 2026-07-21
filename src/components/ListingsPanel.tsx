@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import type { Listing } from "../data/listings";
+import type { Listing, ListingMode } from "../data/listings";
 import { ListingCard } from "./ListingCard";
 
 export type SortMode = "featured" | "price-asc" | "price-desc";
 
 interface Props {
   listings: Listing[];
+  mode: ListingMode;
   sort: SortMode;
   onSortChange: (s: SortMode) => void;
   selectedId: string | null;
@@ -19,7 +20,7 @@ const SORT_LABELS: Record<SortMode, string> = {
   "price-desc": "Price (High to Low)",
 };
 
-export function ListingsPanel({ listings, sort, onSortChange, selectedId, onHover, onSelect }: Props) {
+export function ListingsPanel({ listings, mode, sort, onSortChange, selectedId, onHover, onSelect }: Props) {
   const [sortOpen, setSortOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const sortRef = useRef<HTMLDivElement>(null);
@@ -41,10 +42,14 @@ export function ListingsPanel({ listings, sort, onSortChange, selectedId, onHove
     el?.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }, [selectedId]);
 
+  const heading = mode === "sale"
+    ? "Marina del Rey CA Boat Slips for Sale"
+    : "Marina del Rey CA Boat Slips & Yacht Clubs";
+
   return (
     <section className="listings-panel" ref={panelRef}>
       <div className="results-head">
-        <h1>Marina del Rey CA Boat Slips &amp; Yacht Clubs</h1>
+        <h1>{heading}</h1>
         <div className="results-meta">
           <span className="results-count">{listings.length} results</span>
           <div className="sort-wrap" ref={sortRef}>
@@ -52,7 +57,7 @@ export function ListingsPanel({ listings, sort, onSortChange, selectedId, onHove
               Sort: <b>{SORT_LABELS[sort]}</b> <span className="chev">▾</span>
             </button>
             {sortOpen && (
-              <div className="dropdown sort-dropdown">
+              <div className="dropdown sort-dropdown pop-enter">
                 {(Object.keys(SORT_LABELS) as SortMode[]).map((m) => (
                   <button
                     key={m}
@@ -71,11 +76,12 @@ export function ListingsPanel({ listings, sort, onSortChange, selectedId, onHove
         </div>
       </div>
 
-      <div className="card-grid">
-        {listings.map((l) => (
+      <div className="card-grid" key={`${mode}-${sort}`}>
+        {listings.map((l, i) => (
           <div data-card-id={l.id} key={l.id}>
             <ListingCard
               listing={l}
+              index={i}
               selected={l.id === selectedId}
               onHover={onHover}
               onSelect={onSelect}
@@ -88,14 +94,14 @@ export function ListingsPanel({ listings, sort, onSortChange, selectedId, onHove
         <div className="empty-state">
           <div className="empty-goat">🐐</div>
           <p>No listings match your filters.</p>
-          <p className="empty-sub">Try widening your price range or slip length.</p>
+          <p className="empty-sub">Try widening your price range, slip length, or amenities.</p>
         </div>
       )}
 
       <footer className="panel-footer">
-        BoatGoat is the G.O.A.T. of boat slips. Listing data is illustrative MVP
-        sample data for Marina del Rey, CA. Map ©
-        OpenStreetMap contributors.
+        BoatGoat is the G.O.A.T. of boat slips. Listings, pricing, ratings, and the
+        BoatGoat Estimate are illustrative MVP sample data for Marina del Rey, CA —
+        not a real appraisal. Map © OpenStreetMap contributors.
       </footer>
     </section>
   );
