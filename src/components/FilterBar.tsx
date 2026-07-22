@@ -159,30 +159,27 @@ export function FilterBar({ filters, onChange, query, onQueryChange, mode, onToa
         {open === "price" && (
           <div className="dropdown pop-enter">
             <div className="dropdown-heading">{mode === "sale" ? "Sale price" : "Monthly price"}</div>
-            <div className="range-row">
-              <select
-                value={filters.minPrice ?? ""}
-                onChange={(e) =>
-                  onChange({ ...filters, minPrice: e.target.value === "" ? null : Number(e.target.value) })
-                }
-              >
-                <option value="">No min</option>
-                {priceStops.map((p) => (
-                  <option key={p} value={p}>{money(p)}</option>
-                ))}
-              </select>
-              <span className="range-dash">–</span>
-              <select
-                value={filters.maxPrice ?? ""}
-                onChange={(e) =>
-                  onChange({ ...filters, maxPrice: e.target.value === "" ? null : Number(e.target.value) })
-                }
-              >
-                <option value="">No max</option>
-                {priceStops.slice(1).map((p) => (
-                  <option key={p} value={p}>{money(p)}</option>
-                ))}
-              </select>
+            <div className="slider-section">
+              <div className="slider-label">{filters.minPrice !== null ? money(filters.minPrice) : "$0"} – {filters.maxPrice !== null ? money(filters.maxPrice) : "Any"}</div>
+              <input
+                type="range"
+                className="slider min-price"
+                min={priceStops[0]}
+                max={priceStops[priceStops.length - 1]}
+                step={priceStops[1]}
+                value={filters.minPrice ?? priceStops[0]}
+                onChange={(e) => onChange({ ...filters, minPrice: Number(e.target.value) || null })}
+              />
+              <input
+                type="range"
+                className="slider max-price"
+                min={priceStops[0]}
+                max={priceStops[priceStops.length - 1]}
+                step={priceStops[1]}
+                value={filters.maxPrice ?? priceStops[priceStops.length - 1]}
+                onChange={(e) => onChange({ ...filters, maxPrice: Number(e.target.value) || null })}
+              />
+              <button className="clear-link" onClick={() => onChange({ ...filters, minPrice: null, maxPrice: null })}>Clear</button>
             </div>
           </div>
         )}
@@ -195,22 +192,18 @@ export function FilterBar({ filters, onChange, query, onQueryChange, mode, onToa
         {open === "length" && (
           <div className="dropdown pop-enter">
             <div className="dropdown-heading">Minimum slip length</div>
-            <div className="length-grid">
-              <button
-                className={"length-opt" + (filters.minLength === null ? " sel" : "")}
-                onClick={() => onChange({ ...filters, minLength: null })}
-              >
-                Any
-              </button>
-              {LENGTH_STOPS.map((ft) => (
-                <button
-                  key={ft}
-                  className={"length-opt" + (filters.minLength === ft ? " sel" : "")}
-                  onClick={() => onChange({ ...filters, minLength: ft })}
-                >
-                  {ft} ft
-                </button>
-              ))}
+            <div className="slider-section">
+              <div className="slider-label">{filters.minLength !== null ? `${filters.minLength}+ ft` : "Any"}</div>
+              <input
+                type="range"
+                className="slider length-slider"
+                min={LENGTH_STOPS[0]}
+                max={LENGTH_STOPS[LENGTH_STOPS.length - 1]}
+                step="1"
+                value={filters.minLength ?? LENGTH_STOPS[0]}
+                onChange={(e) => onChange({ ...filters, minLength: Number(e.target.value) || null })}
+              />
+              <button className="clear-link" onClick={() => onChange({ ...filters, minLength: null })}>Clear</button>
             </div>
           </div>
         )}

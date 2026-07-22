@@ -101,7 +101,7 @@ export function ListingDetail({ listing, onClose }: Props) {
         {/* AI overall take — grounded in real data, only when configured */}
         <section className="ai-take">
           <div className="ai-take-head">
-            <span className="ai-badge">BoatGoat AI</span>
+            <span className="ai-badge">goaty</span>
             {summary && <span className="ai-score">{summary.score}<small>/100</small></span>}
           </div>
           {serverLoading ? (
@@ -198,14 +198,14 @@ export function ListingDetail({ listing, onClose }: Props) {
             </div>
           ) : place && place.reviews.length > 0 ? (
             <div className="reviews">
-              {place.reviews.map((r, i) => (
+              {place.reviews.slice(0, 3).map((r, i) => (
                 <div className="review" key={i}>
                   <div className="review-head">
                     <b>{r.author}</b>
                     <Stars rating={r.rating} />
                   </div>
                   {r.relativeTime && <div className="review-time">{r.relativeTime}</div>}
-                  <p className="review-text">{r.text}</p>
+                  <p className="review-text">{r.text.length > 120 ? r.text.slice(0, 120) + "…" : r.text}</p>
                 </div>
               ))}
             </div>
