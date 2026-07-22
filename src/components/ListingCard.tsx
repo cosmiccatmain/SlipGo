@@ -8,7 +8,7 @@ interface Props {
   index: number;
   selected: boolean;
   onHover: (id: string | null) => void;
-  onSelect: (id: string) => void;
+  onOpen: (id: string) => void;
 }
 
 const TYPE_BADGE: Record<Listing["type"], string | null> = {
@@ -17,7 +17,7 @@ const TYPE_BADGE: Record<Listing["type"], string | null> = {
   "yacht-club": "Yacht club",
 };
 
-export function ListingCard({ listing, index, selected, onHover, onSelect }: Props) {
+export function ListingCard({ listing, index, selected, onHover, onOpen }: Props) {
   const [liked, setLiked] = useState(false);
   const badge = listing.mode === "sale" ? "For sale" : TYPE_BADGE[listing.type];
   const badgeClass = listing.mode === "sale" ? "sale" : listing.type;
@@ -60,7 +60,7 @@ export function ListingCard({ listing, index, selected, onHover, onSelect }: Pro
       style={{ animationDelay: `${Math.min(index, 11) * 45}ms` }}
       onMouseEnter={() => onHover(listing.id)}
       onMouseLeave={() => onHover(null)}
-      onClick={() => onSelect(listing.id)}
+      onClick={() => onOpen(listing.id)}
     >
       <div className="card-photo">
         <img src={marinaPhoto(listing.photoSeed)} alt={listing.name} loading="lazy" />

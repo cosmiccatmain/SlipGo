@@ -5,7 +5,8 @@ import { ListingsPanel, type SortMode } from "./components/ListingsPanel";
 import { MapView } from "./components/MapView";
 import { SignInModal } from "./components/SignInModal";
 import { Toast } from "./components/Toast";
-import { rentListings, saleListings, type ListingType, type ListingMode } from "./data/listings";
+import { ListingDetail } from "./components/ListingDetail";
+import { allListings, rentListings, saleListings, type ListingType, type ListingMode } from "./data/listings";
 
 const ALL_TYPES: ListingType[] = ["marina", "guest-dock", "yacht-club"];
 
@@ -30,6 +31,7 @@ export default function App() {
   const [mobileView, setMobileView] = useState<"list" | "map">("list");
   const [signInOpen, setSignInOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [detailId, setDetailId] = useState<string | null>(null);
 
   // Which top-nav item is highlighted, derived from mode + type filter.
   const activeNav: NavKey = useMemo(() => {
@@ -88,6 +90,15 @@ export default function App() {
     setSelectNonce((n) => n + 1);
   }, []);
 
+  // Clicking a card opens the deeper detail view (and selects it on the map).
+  const openDetail = useCallback((id: string) => {
+    setSelectedId(id);
+    setSelectNonce((n) => n + 1);
+    setDetailId(id);
+  }, []);
+
+  const detailListing = detailId ? allListings.find((l) => l.id === detailId) ?? null : null;
+
   return (
     <div className={"app" + (mobileView === "map" ? " app--mobile-map" : "")}>
       <Header
@@ -119,8 +130,11 @@ export default function App() {
           onSortChange={setSort}
           selectedId={selectedId}
           onHover={setHoveredId}
-          onSelect={handleSelect}
+          onOpen={openDetail}
         />
+        {detailListing && (
+          <ListingDetail listing={detailListing} onClose={() => setDetailId(null)} />
+        )}
       </main>
 
       <button

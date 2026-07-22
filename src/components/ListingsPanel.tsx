@@ -11,7 +11,7 @@ interface Props {
   onSortChange: (s: SortMode) => void;
   selectedId: string | null;
   onHover: (id: string | null) => void;
-  onSelect: (id: string) => void;
+  onOpen: (id: string) => void;
 }
 
 const SORT_LABELS: Record<SortMode, string> = {
@@ -20,7 +20,7 @@ const SORT_LABELS: Record<SortMode, string> = {
   "price-desc": "Price (High to Low)",
 };
 
-export function ListingsPanel({ listings, mode, sort, onSortChange, selectedId, onHover, onSelect }: Props) {
+export function ListingsPanel({ listings, mode, sort, onSortChange, selectedId, onHover, onOpen }: Props) {
   const [sortOpen, setSortOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const sortRef = useRef<HTMLDivElement>(null);
@@ -84,7 +84,7 @@ export function ListingsPanel({ listings, mode, sort, onSortChange, selectedId, 
               index={i}
               selected={l.id === selectedId}
               onHover={onHover}
-              onSelect={onSelect}
+              onOpen={onOpen}
             />
           </div>
         ))}
