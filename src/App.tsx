@@ -85,11 +85,6 @@ export default function App() {
     return filtered;
   }, [source, filters, sort, query]);
 
-  const handleSelect = useCallback((id: string) => {
-    setSelectedId(id);
-    setSelectNonce((n) => n + 1);
-  }, []);
-
   // Clicking a card opens the deeper detail view (and selects it on the map).
   const openDetail = useCallback((id: string) => {
     setSelectedId(id);
@@ -121,7 +116,7 @@ export default function App() {
           hoveredId={hoveredId}
           selectedId={selectedId}
           selectNonce={selectNonce}
-          onSelect={handleSelect}
+          onOpen={openDetail}
         />
         <ListingsPanel
           listings={visible}

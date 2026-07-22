@@ -23,6 +23,7 @@ interface PlaceInfo {
   reviewCount: number | null;
   reviews: Review[];
   photos: string[];
+  website: string | null;
 }
 
 async function fetchPlace(
@@ -38,7 +39,7 @@ async function fetchPlace(
       "Content-Type": "application/json",
       "X-Goog-Api-Key": key,
       "X-Goog-FieldMask":
-        "places.id,places.displayName,places.rating,places.userRatingCount,places.reviews,places.photos",
+        "places.id,places.displayName,places.rating,places.userRatingCount,places.reviews,places.photos,places.websiteUri",
     },
     body: JSON.stringify({
       textQuery: `${name} ${address}`,
@@ -81,6 +82,7 @@ async function fetchPlace(
     reviewCount: place.userRatingCount ?? null,
     reviews,
     photos,
+    website: place.websiteUri ?? null,
   };
 }
 

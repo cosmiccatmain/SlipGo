@@ -22,6 +22,14 @@ function mapsUrl(l: Listing) {
   );
 }
 
+function prettyDomain(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
+}
+
 function Stars({ rating }: { rating: number }) {
   const full = Math.round(rating);
   return (
@@ -39,6 +47,7 @@ export function ListingDetail({ listing, onClose }: Props) {
 
   const place = server?.place ?? null;
   const summary = server?.summary ?? null;
+  const websiteUrl = place?.website ?? listing.website ?? null;
   const placesConfigured = !!server?.configured.places;
   const aiConfigured = !!server?.configured.ai;
   const offline = !serverLoading && server === null; // no serverless backend reachable
@@ -61,14 +70,26 @@ export function ListingDetail({ listing, onClose }: Props) {
         <button className="detail-back" onClick={onClose}>
           <span aria-hidden="true">←</span> All results
         </button>
-        <a
-          className="detail-source"
-          href={mapsUrl(listing)}
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          Find on Google Maps <span aria-hidden="true">↗</span>
-        </a>
+        <div className="detail-links">
+          {websiteUrl && (
+            <a
+              className="detail-source detail-source--web"
+              href={websiteUrl}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              Visit website <span aria-hidden="true">↗</span>
+            </a>
+          )}
+          <a
+            className="detail-source"
+            href={mapsUrl(listing)}
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            Find on Google Maps <span aria-hidden="true">↗</span>
+          </a>
+        </div>
       </div>
 
       <div className="detail-scroll">
@@ -115,6 +136,23 @@ export function ListingDetail({ listing, onClose }: Props) {
           {listing.neighborhood}
         </div>
         <div className="detail-address">{listing.address}</div>
+        {websiteUrl && (
+          <a
+            className="detail-website"
+            href={websiteUrl}
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+              <path
+                fill="currentColor"
+                d="M12 2a10 10 0 100 20 10 10 0 000-20zm6.9 6h-2.6a15.7 15.7 0 00-1.3-3.4A8 8 0 0118.9 8zM12 4c.8 1 1.5 2.4 1.9 4h-3.8C10.5 6.4 11.2 5 12 4zM4.3 14a8 8 0 010-4h3a17.6 17.6 0 000 4zm.8 2h2.6a15.7 15.7 0 001.3 3.4A8 8 0 015.1 16zm2.6-8H5.1a8 8 0 013.9-3.4A15.7 15.7 0 007.7 8zM12 20c-.8-1-1.5-2.4-1.9-4h3.8c-.4 1.6-1.1 3-1.9 4zm2.3-6H9.7a15.4 15.4 0 010-4h4.6a15.4 15.4 0 010 4zm.4 5.4a15.7 15.7 0 001.3-3.4h2.6a8 8 0 01-3.9 3.4zM17 14a17.6 17.6 0 000-4h3a8 8 0 010 4z"
+              />
+            </svg>
+            {prettyDomain(websiteUrl)}
+            <span aria-hidden="true">↗</span>
+          </a>
+        )}
 
         <div className="detail-estimate">
           <div>

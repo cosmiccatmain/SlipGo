@@ -1,19 +1,23 @@
 import { useCallback, useEffect, useRef } from "react";
 import L from "leaflet";
-import type { Listing } from "../data/listings";
+import { allListings, REGIONS, type Listing, type Region } from "../data/listings";
 import { marinaPhoto } from "../lib/photos";
 import { getEstimate, formatEstimate } from "../lib/estimate";
-import { getCachedPhoto, onEnrichmentReady } from "../lib/enrich";
+import { getCachedPhoto, onEnrichmentReady, prefetchEnrichment } from "../lib/enrich";
 
 const HARBOR_CENTER: [number, number] = [33.9762, -118.4505];
 const HARBOR_ZOOM = 15;
+// Below this zoom the coast-wide view collapses each harbor into one landmark
+// circle; at or above it we show the individual price pins.
+const CLUSTER_ZOOM = 12;
 
 interface Props {
   listings: Listing[];
   hoveredId: string | null;
   selectedId: string | null;
   selectNonce: number;
-  onSelect: (id: string) => void;
+  /** Open the detail sidebar for a listing (also selects + flies to it). */
+  onOpen: (id: string) => void;
 }
 
 function popupHtml(l: Listing): string {
@@ -44,20 +48,35 @@ function popupHtml(l: Listing): string {
     </div>`;
 }
 
-export function MapView({ listings, hoveredId, selectedId, selectNonce, onSelect }: Props) {
+function clusterHtml(region: Region, count: number): string {
+  const meta = REGIONS[region];
+  const photo = getCachedPhoto(meta.flagshipId) ?? marinaPhoto(meta.photoSeed);
+  const label = `${count} slip${count === 1 ? "" : "s"}`;
+  return `
+    <div class="region-cluster" style="background-image:url('${photo}')">
+      <span class="region-scrim"></span>
+      <span class="region-label">${meta.label}</span>
+      <span class="region-count">${label}</span>
+    </div>`;
+}
+
+export function MapView({ listings, hoveredId, selectedId, selectNonce, onOpen }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
-  const markersRef = useRef<Map<string, L.Marker>>(new Map());
+  const pinMarkersRef = useRef<Map<string, L.Marker>>(new Map());
+  const clusterMarkersRef = useRef<L.Marker[]>([]);
+  const modeRef = useRef<"pins" | "clusters" | null>(null);
   const hoveredRef = useRef<string | null>(null);
   const selectedRef = useRef<string | null>(null);
   const listingsRef = useRef<Listing[]>(listings);
+  const onOpenRef = useRef(onOpen);
   const sizedRef = useRef(false);
   hoveredRef.current = hoveredId;
   selectedRef.current = selectedId;
   listingsRef.current = listings;
+  onOpenRef.current = onOpen;
 
-  // Frame the map around exactly the listings currently shown, so the pins
-  // always make it obvious which harbor each slip is in.
+  // Frame the map around exactly the listings currently shown.
   const fitToListings = useCallback(() => {
     const map = mapRef.current;
     const ls = listingsRef.current;
@@ -68,6 +87,67 @@ export function MapView({ listings, hoveredId, selectedId, selectNonce, onSelect
     }
     const bounds = L.latLngBounds(ls.map((l) => [l.lat, l.lon] as [number, number]));
     map.fitBounds(bounds, { padding: [64, 64], maxZoom: 15 });
+  }, []);
+
+  // Render either individual price pins or the region landmark circles,
+  // depending on the current zoom.
+  const render = useCallback(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    pinMarkersRef.current.forEach((m) => m.remove());
+    pinMarkersRef.current.clear();
+    clusterMarkersRef.current.forEach((m) => m.remove());
+    clusterMarkersRef.current = [];
+
+    const ls = listingsRef.current;
+    const mode = map.getZoom() < CLUSTER_ZOOM ? "clusters" : "pins";
+    modeRef.current = mode;
+
+    if (mode === "clusters") {
+      const counts = new Map<Region, number>();
+      ls.forEach((l) => counts.set(l.region, (counts.get(l.region) ?? 0) + 1));
+      counts.forEach((count, region) => {
+        const meta = REGIONS[region];
+        const icon = L.divIcon({
+          className: "cluster-anchor",
+          html: clusterHtml(region, count),
+          iconSize: [0, 0],
+          iconAnchor: [0, 0],
+        });
+        const marker = L.marker(meta.center, { icon, riseOnHover: true }).addTo(map);
+        marker.on("click", () =>
+          map.flyTo(meta.center, CLUSTER_ZOOM + 2, { duration: 0.7 }),
+        );
+        clusterMarkersRef.current.push(marker);
+      });
+      return;
+    }
+
+    ls.forEach((l) => {
+      const hot = l.id === hoveredRef.current ? " hot" : "";
+      const icon = L.divIcon({
+        className: "pin-anchor",
+        html: `<div class="price-pin ${l.type}${l.mode === "sale" ? " sale" : ""}${hot}">${l.pinLabel}</div>`,
+        iconSize: [0, 0],
+        iconAnchor: [0, 0],
+      });
+      const marker = L.marker([l.lat, l.lon], { icon, riseOnHover: true })
+        .addTo(map)
+        .bindPopup(popupHtml(l), {
+          closeButton: false,
+          offset: [0, -34],
+          minWidth: 260,
+          maxWidth: 260,
+          autoPan: false,
+          className: "bg-popup",
+        });
+      // Hover previews the mini-card; click opens the full detail sidebar.
+      marker.on("mouseover", () => marker.openPopup());
+      marker.on("mouseout", () => marker.closePopup());
+      marker.on("click", () => onOpenRef.current(l.id));
+      pinMarkersRef.current.set(l.id, marker);
+    });
   }, []);
 
   useEffect(() => {
@@ -89,6 +169,12 @@ export function MapView({ listings, hoveredId, selectedId, selectNonce, onSelect
     ).addTo(map);
     mapRef.current = map;
 
+    // Swap pins <-> clusters when a zoom change crosses the threshold.
+    map.on("zoomend", () => {
+      const nextMode = map.getZoom() < CLUSTER_ZOOM ? "clusters" : "pins";
+      if (nextMode !== modeRef.current) render();
+    });
+
     // The container can be 0x0 on first paint / when hidden behind the mobile
     // toggle. Fit to the listings once real size arrives, invalidate afterwards.
     const ro = new ResizeObserver(() => {
@@ -97,70 +183,55 @@ export function MapView({ listings, hoveredId, selectedId, selectNonce, onSelect
       map.invalidateSize();
       if (!sizedRef.current) {
         sizedRef.current = true;
-        // Defer one frame so the container has its final size before fitting
-        // (avoids a transient over-zoom when the mobile map first appears).
-        requestAnimationFrame(() => fitToListings());
+        // Defer one frame so the container has its final size before fitting.
+        requestAnimationFrame(() => {
+          fitToListings();
+          render();
+        });
       }
     });
     ro.observe(containerRef.current);
+
+    // Warm each region's flagship photo so the landmark circles show real
+    // imagery (cheap: one prefetch per region).
+    Object.values(REGIONS).forEach((meta) => {
+      const flagship = allListings.find((l) => l.id === meta.flagshipId);
+      if (flagship) prefetchEnrichment(flagship);
+    });
 
     return () => {
       ro.disconnect();
       map.remove();
       mapRef.current = null;
     };
-  }, []);
+  }, [fitToListings, render]);
 
-  // Rebuild markers whenever the filtered listing set changes.
+  // Rebuild the active layer whenever the filtered set changes, then reframe
+  // (unless a selection popup should stay open).
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
-    markersRef.current.forEach((m) => m.remove());
-    markersRef.current.clear();
+    render();
+    if (!selectedRef.current && sizedRef.current) fitToListings();
+  }, [listings, render, fitToListings]);
 
-    listings.forEach((l) => {
-      const hot = l.id === hoveredRef.current ? " hot" : "";
-      const icon = L.divIcon({
-        className: "pin-anchor",
-        html: `<div class="price-pin ${l.type}${l.mode === "sale" ? " sale" : ""}${hot}">${l.pinLabel}</div>`,
-        iconSize: [0, 0],
-        iconAnchor: [0, 0],
-      });
-      const marker = L.marker([l.lat, l.lon], { icon, riseOnHover: true })
-        .addTo(map)
-        .bindPopup(popupHtml(l), {
-          closeButton: true,
-          offset: [0, -34],
-          minWidth: 260,
-          maxWidth: 260,
-          className: "bg-popup",
-        });
-      marker.on("click", () => onSelect(l.id));
-      markersRef.current.set(l.id, marker);
-    });
-
-    // Keep the current selection's popup open after a rebuild; otherwise the
-    // visible set just changed (filter / search / region), so reframe the map.
-    if (selectedRef.current) {
-      markersRef.current.get(selectedRef.current)?.openPopup();
-    } else if (sizedRef.current) {
-      fitToListings();
-    }
-  }, [listings, onSelect, fitToListings]);
-
-  // When a listing's real photo finishes loading, refresh its popup so the
-  // stock illustration is replaced (even while the popup is open).
+  // When a listing's real photo loads, refresh the popup (pins) or the region
+  // circles (clusters) so the illustration is replaced.
   useEffect(() => {
     return onEnrichmentReady((id) => {
-      const marker = markersRef.current.get(id);
+      if (modeRef.current === "clusters") {
+        render();
+        return;
+      }
+      const marker = pinMarkersRef.current.get(id);
       const l = listingsRef.current.find((x) => x.id === id);
       if (marker && l) marker.setPopupContent(popupHtml(l));
     });
-  }, []);
+  }, [render]);
 
-  // Card hover -> grow the matching pin.
+  // Card hover -> grow the matching pin (pins mode only).
   useEffect(() => {
-    markersRef.current.forEach((marker, id) => {
+    pinMarkersRef.current.forEach((marker, id) => {
       const el = marker.getElement()?.querySelector(".price-pin");
       if (!el) return;
       el.classList.toggle("hot", id === hoveredId);
@@ -168,15 +239,15 @@ export function MapView({ listings, hoveredId, selectedId, selectNonce, onSelect
     });
   }, [hoveredId]);
 
-  // Card/pin click -> fly to it + open popup. Depends on the nonce so
-  // re-selecting the same listing still re-centers and reopens.
+  // Card/pin selection -> fly to the listing (zooming in past the cluster
+  // threshold so its pin is visible). Depends on the nonce so re-selecting the
+  // same listing still re-centers.
   useEffect(() => {
     if (!selectedId) return;
-    const marker = markersRef.current.get(selectedId);
     const map = mapRef.current;
-    if (marker && map) {
-      map.flyTo(marker.getLatLng(), Math.max(map.getZoom(), 15), { duration: 0.6 });
-      marker.openPopup();
+    const l = listingsRef.current.find((x) => x.id === selectedId);
+    if (map && l) {
+      map.flyTo([l.lat, l.lon], Math.max(map.getZoom(), 15), { duration: 0.6 });
     }
   }, [selectNonce, selectedId]);
 

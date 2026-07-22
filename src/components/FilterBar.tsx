@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { AMENITY_OPTIONS, type ListingMode, type ListingType } from "../data/listings";
 
 export interface Filters {
@@ -201,6 +201,16 @@ export function FilterBar({ filters, onChange, query, onQueryChange, mode, onToa
                 max={LENGTH_STOPS[LENGTH_STOPS.length - 1]}
                 step="1"
                 value={filters.minLength ?? LENGTH_STOPS[0]}
+                style={
+                  {
+                    // Drives the value-following fill in CSS.
+                    "--pct": `${
+                      (((filters.minLength ?? LENGTH_STOPS[0]) - LENGTH_STOPS[0]) /
+                        (LENGTH_STOPS[LENGTH_STOPS.length - 1] - LENGTH_STOPS[0])) *
+                      100
+                    }%`,
+                  } as CSSProperties
+                }
                 onChange={(e) => onChange({ ...filters, minLength: Number(e.target.value) || null })}
               />
               <button className="clear-link" onClick={() => onChange({ ...filters, minLength: null })}>Clear</button>

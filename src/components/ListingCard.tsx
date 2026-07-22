@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Listing } from "../data/listings";
 import { marinaPhoto } from "../lib/photos";
 import { getEstimate, formatEstimate } from "../lib/estimate";
-import { prefetchEnrichment } from "../lib/enrich";
+import { prefetchEnrichment, getCachedPhoto, onEnrichmentReady } from "../lib/enrich";
 
 interface Props {
   listing: Listing;
@@ -23,6 +23,36 @@ export function ListingCard({ listing, index, selected, onHover, onOpen }: Props
   const badge = listing.mode === "sale" ? "For sale" : TYPE_BADGE[listing.type];
   const badgeClass = listing.mode === "sale" ? "sale" : listing.type;
   const est = getEstimate(listing);
+
+  // Real Google photo, lazy-loaded when the card scrolls into view. Falls back
+  // to the illustration until (and unless) a real photo is available.
+  const photoRef = useRef<HTMLDivElement>(null);
+  const [photo, setPhoto] = useState<string | null>(() => getCachedPhoto(listing.id));
+  const [photoLoaded, setPhotoLoaded] = useState(false);
+
+  useEffect(() => {
+    const el = photoRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          prefetchEnrichment(listing); // only fetch what the user actually sees
+          io.disconnect();
+        }
+      },
+      { rootMargin: "300px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [listing.id]);
+
+  useEffect(() => {
+    setPhoto(getCachedPhoto(listing.id));
+    setPhotoLoaded(false);
+    return onEnrichmentReady((id) => {
+      if (id === listing.id) setPhoto(getCachedPhoto(listing.id));
+    });
+  }, [listing.id]);
 
   let specs: React.ReactNode;
   if (listing.mode === "sale") {
@@ -67,8 +97,22 @@ export function ListingCard({ listing, index, selected, onHover, onOpen }: Props
       onPointerDown={() => prefetchEnrichment(listing)} // covers tap on mobile
       onClick={() => onOpen(listing.id)}
     >
-      <div className="card-photo">
-        <img src={marinaPhoto(listing.photoSeed)} alt={listing.name} loading="lazy" />
+      <div className="card-photo" ref={photoRef}>
+        <img
+          className="card-illustration"
+          src={marinaPhoto(listing.photoSeed)}
+          alt={listing.name}
+          loading="lazy"
+        />
+        {photo && (
+          <img
+            className={"card-real" + (photoLoaded ? " loaded" : "")}
+            src={photo}
+            alt={listing.name}
+            loading="lazy"
+            onLoad={() => setPhotoLoaded(true)}
+          />
+        )}
         {badge && <span className={"card-badge " + badgeClass}>{badge}</span>}
         <button
           className={"heart" + (liked ? " liked" : "")}

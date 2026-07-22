@@ -29,6 +29,8 @@ export interface PlaceInfo {
   reviews: Review[];
   /** Proxied photo URLs (served through /api/photo so the key stays hidden). */
   photos: string[];
+  /** The marina operator's official website, from Google Places (or null). */
+  website: string | null;
 }
 
 export interface AiSummary {
