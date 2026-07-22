@@ -52,6 +52,15 @@ export function FilterBar({ filters, onChange, query, onQueryChange, mode, onToa
 
   const priceStops = mode === "sale" ? SALE_PRICE_STOPS : RENT_PRICE_STOPS;
 
+  // Dual-range price slider bounds/geometry.
+  const priceLo = priceStops[0];
+  const priceHi = priceStops[priceStops.length - 1];
+  const priceStep = mode === "sale" ? 5000 : 25;
+  const minVal = filters.minPrice ?? priceLo;
+  const maxVal = filters.maxPrice ?? priceHi;
+  const minPct = ((minVal - priceLo) / (priceHi - priceLo)) * 100;
+  const maxPct = ((maxVal - priceLo) / (priceHi - priceLo)) * 100;
+
   const toggleType = (t: ListingType) => {
     const next = new Set(filters.types);
     if (next.has(t)) {
@@ -159,27 +168,54 @@ export function FilterBar({ filters, onChange, query, onQueryChange, mode, onToa
         {open === "price" && (
           <div className="dropdown pop-enter">
             <div className="dropdown-heading">{mode === "sale" ? "Sale price" : "Monthly price"}</div>
-            <div className="slider-section">
-              <div className="slider-label">{filters.minPrice !== null ? money(filters.minPrice) : "$0"} – {filters.maxPrice !== null ? money(filters.maxPrice) : "Any"}</div>
-              <input
-                type="range"
-                className="slider min-price"
-                min={priceStops[0]}
-                max={priceStops[priceStops.length - 1]}
-                step={priceStops[1]}
-                value={filters.minPrice ?? priceStops[0]}
-                onChange={(e) => onChange({ ...filters, minPrice: Number(e.target.value) || null })}
-              />
-              <input
-                type="range"
-                className="slider max-price"
-                min={priceStops[0]}
-                max={priceStops[priceStops.length - 1]}
-                step={priceStops[1]}
-                value={filters.maxPrice ?? priceStops[priceStops.length - 1]}
-                onChange={(e) => onChange({ ...filters, maxPrice: Number(e.target.value) || null })}
-              />
-              <button className="clear-link" onClick={() => onChange({ ...filters, minPrice: null, maxPrice: null })}>Clear</button>
+            <div className="range-section">
+              <div className="range-values">
+                <span>{minVal <= priceLo ? "$0" : money(minVal)}</span>
+                <span>{maxVal >= priceHi ? "Any" : money(maxVal)}</span>
+              </div>
+              <div
+                className="range"
+                style={{ "--a": `${minPct}%`, "--b": `${maxPct}%` } as CSSProperties}
+              >
+                <div className="range-rail" />
+                <div className="range-fill" />
+                <input
+                  type="range"
+                  className="range-input"
+                  min={priceLo}
+                  max={priceHi}
+                  step={priceStep}
+                  value={minVal}
+                  style={{ zIndex: minPct > 55 ? 6 : 4 }}
+                  aria-label="Minimum price"
+                  onChange={(e) => {
+                    const v = Math.min(Number(e.target.value), maxVal);
+                    onChange({ ...filters, minPrice: v <= priceLo ? null : v });
+                  }}
+                />
+                <input
+                  type="range"
+                  className="range-input"
+                  min={priceLo}
+                  max={priceHi}
+                  step={priceStep}
+                  value={maxVal}
+                  style={{ zIndex: 5 }}
+                  aria-label="Maximum price"
+                  onChange={(e) => {
+                    const v = Math.max(Number(e.target.value), minVal);
+                    onChange({ ...filters, maxPrice: v >= priceHi ? null : v });
+                  }}
+                />
+              </div>
+              {priceActive && (
+                <button
+                  className="clear-link"
+                  onClick={() => onChange({ ...filters, minPrice: null, maxPrice: null })}
+                >
+                  Clear
+                </button>
+              )}
             </div>
           </div>
         )}

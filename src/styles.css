@@ -582,6 +582,110 @@ button {
   box-shadow: 0 5px 12px rgba(124, 63, 176, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.9);
 }
 
+/* ── Price dual-range slider (two handles, filled bar between) ──────────────── */
+.range-section {
+  padding: 2px 6px 0;
+}
+
+.range-values {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.range {
+  position: relative;
+  height: 22px;
+  margin: 0 11px; /* keeps the handles clear of the popover edges */
+}
+
+.range-rail {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 6px;
+  transform: translateY(-50%);
+  background: var(--border-light);
+  border-radius: 999px;
+}
+
+.range-fill {
+  position: absolute;
+  top: 50%;
+  height: 6px;
+  transform: translateY(-50%);
+  left: var(--a, 0%);
+  right: calc(100% - var(--b, 100%));
+  background: linear-gradient(90deg, #5b4d9e, #7c5cdb);
+  border-radius: 999px;
+}
+
+/* Both inputs overlap the full width; only their thumbs catch pointer events. */
+.range-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 22px;
+  margin: 0;
+  background: transparent;
+  pointer-events: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.range-input:focus {
+  outline: none;
+}
+
+.range-input::-webkit-slider-runnable-track {
+  height: 22px;
+  background: transparent;
+}
+
+.range-input::-moz-range-track {
+  height: 22px;
+  background: transparent;
+}
+
+.range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #7c5cdb;
+  box-shadow: 0 2px 5px rgba(11, 44, 77, 0.3);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.range-input::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #7c5cdb;
+  box-shadow: 0 2px 5px rgba(11, 44, 77, 0.3);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.range-input::-webkit-slider-thumb:hover {
+  transform: scale(1.12);
+}
+
+.range-input::-webkit-slider-thumb:active {
+  transform: scale(1.2);
+  box-shadow: 0 3px 9px rgba(124, 92, 219, 0.5);
+}
+
 .filter-spacer {
   flex: 1;
 }
@@ -676,66 +780,6 @@ button {
   border: none;
 }
 
-/* ── Zoomed-out landmark circles (one per harbor region) ─────────────────── */
-.cluster-anchor {
-  background: none;
-  border: none;
-}
-
-.region-cluster {
-  position: absolute;
-  left: 0;
-  top: 0;
-  transform: translate(-50%, -50%);
-  width: 78px;
-  height: 78px;
-  border-radius: 50%;
-  background-color: #cdd8e2;
-  background-size: cover;
-  background-position: center;
-  border: 3px solid #fff;
-  box-shadow: 0 4px 14px rgba(11, 44, 77, 0.4);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: transform 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.region-cluster:hover {
-  transform: translate(-50%, -50%) scale(1.08);
-}
-
-.region-scrim {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(11, 44, 77, 0.2) 0%, rgba(11, 44, 77, 0.72) 100%);
-}
-
-.region-label {
-  position: relative;
-  color: #fff;
-  font-size: 11px;
-  font-weight: 800;
-  line-height: 1.1;
-  text-align: center;
-  padding: 0 6px;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.65);
-}
-
-.region-count {
-  position: relative;
-  margin-top: 3px;
-  background: #fff;
-  color: var(--navy);
-  font-size: 10.5px;
-  font-weight: 800;
-  padding: 2px 8px;
-  border-radius: 999px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
 
 .price-pin {
   position: absolute;
@@ -888,6 +932,7 @@ button {
   width: 384px;
   flex-shrink: 0;
   overflow-y: auto;
+  scrollbar-gutter: stable;
   padding: 16px 16px 0;
   background: #fff;
   border-left: 1px solid var(--border-light);
@@ -1507,8 +1552,94 @@ button {
   flex-shrink: 0;
 }
 
+/* ── Safety rating ────────────────────────────────────────────────────────── */
+.safety-card {
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.safety-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.safety-grade {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  background: var(--teal);
+  flex-shrink: 0;
+}
+
+.safety-grade.pending {
+  background: var(--border);
+  color: var(--faint);
+}
+
+.safety-meta {
+  min-width: 0;
+}
+
+.safety-score-line {
+  font-size: 15px;
+  color: var(--text);
+}
+
+.safety-score-line b {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.safety-score-line small {
+  color: var(--muted);
+  margin-left: 3px;
+}
+
+.safety-pending-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--faint);
+}
+
+.safety-source {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.safety-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--border-light);
+  margin-top: 12px;
+  overflow: hidden;
+}
+
+.safety-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--teal), var(--teal-dark));
+  transition: width 0.4s ease;
+}
+
+.safety-note {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-top: 10px;
+  line-height: 1.45;
+}
+
 .detail-scroll {
   overflow-y: auto;
+  scrollbar-gutter: stable;
   padding: 0 16px 28px;
 }
 
@@ -2072,6 +2203,42 @@ img.detail-hero.loaded {
 }
 
 /* ─────────────────────── Responsive ─────────────────────── */
+
+/* Extra-large screens: give the list + detail more breathing room. */
+@media (min-width: 1800px) {
+  .listings-panel {
+    width: 500px;
+    padding: 22px 22px 0;
+  }
+
+  .detail {
+    width: 520px;
+  }
+
+  .results-head h1 {
+    font-size: 22px;
+  }
+}
+
+/* Large desktops: a touch wider + roomier. */
+@media (min-width: 1440px) and (max-width: 1799px) {
+  .listings-panel {
+    width: 440px;
+    padding: 20px 20px 0;
+  }
+
+  .detail {
+    width: 460px;
+  }
+
+  .results-head h1 {
+    font-size: 21px;
+  }
+
+  .card-grid {
+    gap: 18px;
+  }
+}
 
 @media (max-width: 1180px) {
   .listings-panel {

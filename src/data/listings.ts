@@ -46,22 +46,6 @@ export interface Listing {
   website?: string;
 }
 
-// Per-region "landmark" metadata for the zoomed-out map: a center point, a
-// display label, and a flagship listing whose real Google photo (and stock
-// seed) represents the harbor on the region circle.
-export interface RegionMeta {
-  label: string;
-  center: [number, number];
-  flagshipId: string;
-  photoSeed: number;
-}
-export const REGIONS: Record<Region, RegionMeta> = {
-  mdr: { label: "Marina del Rey", center: [33.9762, -118.4505], flagshipId: "esprit", photoSeed: 0 },
-  "long-beach": { label: "Long Beach", center: [33.757, -118.15], flagshipId: "alamitos-bay", photoSeed: 0 },
-  "santa-barbara": { label: "Santa Barbara", center: [34.4043, -119.6913], flagshipId: "sb-harbor", photoSeed: 3 },
-  newport: { label: "Newport Beach", center: [33.612, -117.9], flagshipId: "balboa-marina", photoSeed: 4 },
-};
-
 // Amenity vocabulary surfaced in the "More" filter.
 export const AMENITY_OPTIONS = [
   "Liveaboard OK",

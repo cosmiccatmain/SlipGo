@@ -3,6 +3,7 @@ import { events, type Listing } from "../data/listings";
 import { marinaPhoto } from "../lib/photos";
 import { getEstimate, formatEstimate } from "../lib/estimate";
 import { useEnrichment } from "../lib/enrich";
+import { getSafety } from "../lib/safety";
 
 interface Props {
   listing: Listing;
@@ -48,6 +49,14 @@ export function ListingDetail({ listing, onClose }: Props) {
   const place = server?.place ?? null;
   const summary = server?.summary ?? null;
   const websiteUrl = place?.website ?? listing.website ?? null;
+  const safety = getSafety(listing);
+  // Official goaty rating blends the AI score with safety once crime data is
+  // wired (currently safety.ready is false, so it's just the AI score).
+  const officialScore = summary
+    ? safety.ready && safety.score !== null
+      ? Math.round(summary.score * 0.8 + safety.score * 0.2)
+      : summary.score
+    : null;
   const placesConfigured = !!server?.configured.places;
   const aiConfigured = !!server?.configured.ai;
   const offline = !serverLoading && server === null; // no serverless backend reachable
@@ -166,7 +175,7 @@ export function ListingDetail({ listing, onClose }: Props) {
         <section className="ai-take">
           <div className="ai-take-head">
             <span className="ai-badge">goaty</span>
-            {summary && <span className="ai-score">{summary.score}<small>/100</small></span>}
+            {officialScore !== null && <span className="ai-score">{officialScore}<small>/100</small></span>}
           </div>
           {serverLoading ? (
             <div className="skel-lines">
@@ -241,14 +250,42 @@ export function ListingDetail({ listing, onClose }: Props) {
               <div className="cond-top"><b>Slip neighbors</b></div>
               <div className="cond-muted">Provided by the marina operator — not public data.</div>
             </div>
+          </div>
+        </section>
 
-            <div className="cond-card">
-              <div className="cond-top"><b>Area safety / crime</b></div>
-              <div className="cond-muted">
-                Marina del Rey is LA County (Sheriff) jurisdiction — needs a county
-                crime source; wiring separately so it's accurate.
+        <section className="detail-section">
+          <h3>Safety rating</h3>
+          <div className="safety-card">
+            <div className="safety-head">
+              <div className={"safety-grade" + (safety.ready ? "" : " pending")}>
+                {safety.ready ? safety.grade : "—"}
+              </div>
+              <div className="safety-meta">
+                <div className="safety-score-line">
+                  {safety.ready && safety.score !== null ? (
+                    <>
+                      <b>{safety.score}</b>
+                      <small>/100 safe</small>
+                    </>
+                  ) : (
+                    <span className="safety-pending-label">Preparing</span>
+                  )}
+                </div>
+                <div className="safety-source">Source: {safety.source}</div>
               </div>
             </div>
+            <div className="safety-bar">
+              <div
+                className="safety-bar-fill"
+                style={{ width: safety.ready && safety.score !== null ? `${safety.score}%` : "0%" }}
+              />
+            </div>
+            {!safety.ready && (
+              <p className="safety-note">
+                Crime &amp; safety data is being wired in from {safety.source}. Once
+                live, this Safety score becomes part of the official goaty rating.
+              </p>
+            )}
           </div>
         </section>
 
