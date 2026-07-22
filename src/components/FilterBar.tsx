@@ -196,7 +196,7 @@ export function FilterBar({ filters, onChange, query, onQueryChange, mode, onToa
               <div className="slider-label">{filters.minLength !== null ? `${filters.minLength}+ ft` : "Any"}</div>
               <input
                 type="range"
-                className="slider length-slider"
+                className="length-slider"
                 min={LENGTH_STOPS[0]}
                 max={LENGTH_STOPS[LENGTH_STOPS.length - 1]}
                 step="1"

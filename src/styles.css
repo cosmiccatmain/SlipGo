@@ -495,6 +495,78 @@ button {
   border-radius: 3px;
 }
 
+/* ── Slip-length slider: neon dotted track + glossy pearl knob ────────────────
+   A distinct treatment just for slip length (price keeps the gradient above). */
+.length-slider {
+  width: 100%;
+  margin: 8px 0;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.length-slider:focus {
+  outline: none;
+}
+
+/* --- WebKit / Blink --- */
+.length-slider::-webkit-slider-runnable-track {
+  height: 16px;
+  border-radius: 9px;
+  background-color: #140f1e;
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.32) 0.9px, transparent 1.3px),
+    linear-gradient(90deg, #3b1f6e 0%, #7b3fb0 46%, #d06fdc 100%);
+  background-size: 5px 5px, 100% 100%;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.55);
+}
+
+.length-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  margin-top: -4px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, #ffffff 0%, #f2edfb 45%, #d9cdee 100%);
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.9);
+  border: none;
+  transition: transform 0.1s ease;
+}
+
+.length-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+
+/* --- Firefox --- */
+.length-slider::-moz-range-track {
+  height: 16px;
+  border-radius: 9px;
+  background-color: #140f1e;
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.32) 0.9px, transparent 1.3px),
+    linear-gradient(90deg, #3b1f6e 0%, #7b3fb0 46%, #d06fdc 100%);
+  background-size: 5px 5px, 100% 100%;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.55);
+}
+
+.length-slider::-moz-range-progress {
+  height: 16px;
+  border-radius: 9px;
+  background: transparent;
+}
+
+.length-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, #ffffff 0%, #f2edfb 45%, #d9cdee 100%);
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.9);
+  border: none;
+  cursor: pointer;
+}
+
 .filter-spacer {
   flex: 1;
 }

@@ -127,6 +127,21 @@ const serverCache = new Map<string, ServerEnrichment>();
 const serverInflight = new Map<string, Promise<ServerEnrichment | null>>();
 const windCache = new Map<string, WindInfo>();
 
+// Listeners fired when a listing's server enrichment finishes caching, so views
+// built from a string (e.g. the Leaflet map popup) can swap in the real photo.
+type ReadyListener = (id: string) => void;
+const readyListeners = new Set<ReadyListener>();
+
+export function onEnrichmentReady(fn: ReadyListener): () => void {
+  readyListeners.add(fn);
+  return () => readyListeners.delete(fn);
+}
+
+/** The best cached photo URL for a listing, or null if none is loaded yet. */
+export function getCachedPhoto(id: string): string | null {
+  return serverCache.get(id)?.place?.photos?.[0] ?? null;
+}
+
 function preloadImage(url?: string | null) {
   if (!url || typeof Image === "undefined") return;
   const img = new Image();
@@ -145,6 +160,7 @@ function loadServer(l: Listing): Promise<ServerEnrichment | null> {
         if (res) {
           serverCache.set(l.id, res);
           res.place?.photos?.forEach(preloadImage);
+          if (res.place?.photos?.length) readyListeners.forEach((fn) => fn(l.id));
         }
         serverInflight.delete(l.id);
         return res;

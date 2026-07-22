@@ -3,6 +3,7 @@ import L from "leaflet";
 import type { Listing } from "../data/listings";
 import { marinaPhoto } from "../lib/photos";
 import { getEstimate, formatEstimate } from "../lib/estimate";
+import { getCachedPhoto, onEnrichmentReady } from "../lib/enrich";
 
 const HARBOR_CENTER: [number, number] = [33.9762, -118.4505];
 const HARBOR_ZOOM = 15;
@@ -23,9 +24,10 @@ function popupHtml(l: Listing): string {
       : l.type === "yacht-club"
         ? `${l.rateNote} · up to ${l.maxLengthFt} ft`
         : `${l.slipsOpen} slips open · up to ${l.maxLengthFt} ft`;
+  const photo = getCachedPhoto(l.id) ?? marinaPhoto(l.photoSeed);
   return `
     <div class="map-popup">
-      <img src="${marinaPhoto(l.photoSeed)}" alt="" />
+      <img src="${photo}" alt="" />
       <div class="map-popup-body">
         <div class="map-popup-top">
           <span class="map-popup-price">${l.priceLabel}</span>
@@ -145,6 +147,16 @@ export function MapView({ listings, hoveredId, selectedId, selectNonce, onSelect
       fitToListings();
     }
   }, [listings, onSelect, fitToListings]);
+
+  // When a listing's real photo finishes loading, refresh its popup so the
+  // stock illustration is replaced (even while the popup is open).
+  useEffect(() => {
+    return onEnrichmentReady((id) => {
+      const marker = markersRef.current.get(id);
+      const l = listingsRef.current.find((x) => x.id === id);
+      if (marker && l) marker.setPopupContent(popupHtml(l));
+    });
+  }, []);
 
   // Card hover -> grow the matching pin.
   useEffect(() => {
