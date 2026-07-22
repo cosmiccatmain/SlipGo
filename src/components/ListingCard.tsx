@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Listing } from "../data/listings";
 import { marinaPhoto } from "../lib/photos";
 import { getEstimate, formatEstimate } from "../lib/estimate";
+import { prefetchEnrichment } from "../lib/enrich";
 
 interface Props {
   listing: Listing;
@@ -58,8 +59,12 @@ export function ListingCard({ listing, index, selected, onHover, onOpen }: Props
     <article
       className={"card card-enter" + (selected ? " selected" : "")}
       style={{ animationDelay: `${Math.min(index, 11) * 45}ms` }}
-      onMouseEnter={() => onHover(listing.id)}
+      onMouseEnter={() => {
+        onHover(listing.id);
+        prefetchEnrichment(listing); // warm photos/reviews before the click
+      }}
       onMouseLeave={() => onHover(null)}
+      onPointerDown={() => prefetchEnrichment(listing)} // covers tap on mobile
       onClick={() => onOpen(listing.id)}
     >
       <div className="card-photo">
@@ -91,6 +96,12 @@ export function ListingCard({ listing, index, selected, onHover, onOpen }: Props
           </span>
         </div>
         <div className="card-specs">{specs}</div>
+        <div className="card-neighborhood">
+          <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">
+            <path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1112 6.5a2.5 2.5 0 010 5z" fill="currentColor" />
+          </svg>
+          {listing.neighborhood}
+        </div>
         <div className="card-address">{listing.address}</div>
         <div className="card-estimate">
           <span className="est-label">Est.</span>

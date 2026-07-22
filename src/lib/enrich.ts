@@ -100,7 +100,7 @@ export async function fetchWind(lat: number, lon: number, signal?: AbortSignal):
   };
 }
 
-async function fetchServerEnrichment(l: Listing, signal?: AbortSignal): Promise<ServerEnrichment | null> {
+async function fetchServerEnrichment(l: Listing): Promise<ServerEnrichment | null> {
   const params = new URLSearchParams({
     id: l.id,
     name: l.name,
@@ -109,12 +109,64 @@ async function fetchServerEnrichment(l: Listing, signal?: AbortSignal): Promise<
     lon: String(l.lon),
   });
   try {
-    const res = await fetch(`/api/enrich?${params.toString()}`, { signal });
+    const res = await fetch(`/api/enrich?${params.toString()}`);
     if (!res.ok) return null;
     return (await res.json()) as ServerEnrichment;
   } catch {
     // No serverless backend reachable (e.g. plain `vite dev`) — degrade quietly.
     return null;
+  }
+}
+
+// ── Cross-listing caches ─────────────────────────────────────────────────────
+// Enrichment is expensive (paid Google/OpenAI calls) and shared, so we cache it
+// per listing id for the session and de-dupe in-flight requests. Prefetching on
+// hover means the detail view usually opens with real photos already decoded —
+// no stock-image flash while the network catches up.
+const serverCache = new Map<string, ServerEnrichment>();
+const serverInflight = new Map<string, Promise<ServerEnrichment | null>>();
+const windCache = new Map<string, WindInfo>();
+
+function preloadImage(url?: string | null) {
+  if (!url || typeof Image === "undefined") return;
+  const img = new Image();
+  img.decoding = "async";
+  img.src = url;
+}
+
+/** Fetch (or reuse) server enrichment, caching the result and warming the hero photo. */
+function loadServer(l: Listing): Promise<ServerEnrichment | null> {
+  const hit = serverCache.get(l.id);
+  if (hit) return Promise.resolve(hit);
+  let inflight = serverInflight.get(l.id);
+  if (!inflight) {
+    inflight = fetchServerEnrichment(l)
+      .then((res) => {
+        if (res) {
+          serverCache.set(l.id, res);
+          res.place?.photos?.forEach(preloadImage);
+        }
+        serverInflight.delete(l.id);
+        return res;
+      })
+      .catch(() => {
+        serverInflight.delete(l.id);
+        return null;
+      });
+    serverInflight.set(l.id, inflight);
+  }
+  return inflight;
+}
+
+/** Warm caches for a listing the user is likely about to open (e.g. on hover). */
+export function prefetchEnrichment(l: Listing) {
+  loadServer(l);
+  if (!windCache.has(l.id)) {
+    fetchWind(l.lat, l.lon)
+      .then((w) => {
+        if (w) windCache.set(l.id, w);
+      })
+      .catch(() => {});
   }
 }
 
@@ -126,26 +178,39 @@ export interface EnrichmentState {
 }
 
 export function useEnrichment(listing: Listing): EnrichmentState {
-  const [state, setState] = useState<EnrichmentState>({
-    windLoading: true,
-    wind: null,
-    serverLoading: true,
-    server: null,
+  // Seed synchronously from cache so a prefetched listing opens with zero flash.
+  const [state, setState] = useState<EnrichmentState>(() => {
+    const cw = windCache.get(listing.id) ?? null;
+    const cs = serverCache.get(listing.id) ?? null;
+    return { windLoading: !cw, wind: cw, serverLoading: !cs, server: cs };
   });
 
   useEffect(() => {
+    let alive = true;
     const ctrl = new AbortController();
-    setState({ windLoading: true, wind: null, serverLoading: true, server: null });
+    const cw = windCache.get(listing.id) ?? null;
+    const cs = serverCache.get(listing.id) ?? null;
+    setState({ windLoading: !cw, wind: cw, serverLoading: !cs, server: cs });
 
-    fetchWind(listing.lat, listing.lon, ctrl.signal)
-      .then((wind) => setState((s) => ({ ...s, wind, windLoading: false })))
-      .catch(() => setState((s) => ({ ...s, windLoading: false })));
+    if (!cw) {
+      fetchWind(listing.lat, listing.lon, ctrl.signal)
+        .then((wind) => {
+          if (wind) windCache.set(listing.id, wind);
+          if (alive) setState((s) => ({ ...s, wind, windLoading: false }));
+        })
+        .catch(() => alive && setState((s) => ({ ...s, windLoading: false })));
+    }
 
-    fetchServerEnrichment(listing, ctrl.signal)
-      .then((server) => setState((s) => ({ ...s, server, serverLoading: false })))
-      .catch(() => setState((s) => ({ ...s, serverLoading: false })));
+    if (!cs) {
+      loadServer(listing).then((server) => {
+        if (alive) setState((s) => ({ ...s, server, serverLoading: false }));
+      });
+    }
 
-    return () => ctrl.abort();
+    return () => {
+      alive = false;
+      ctrl.abort();
+    };
   }, [listing.id, listing.lat, listing.lon]);
 
   return state;

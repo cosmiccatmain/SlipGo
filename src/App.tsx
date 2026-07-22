@@ -77,7 +77,7 @@ export default function App() {
       if (filters.amenities.size > 0) {
         for (const a of filters.amenities) if (!l.amenities.includes(a)) return false;
       }
-      if (q && !(`${l.name} ${l.address}`.toLowerCase().includes(q))) return false;
+      if (q && !(`${l.name} ${l.address} ${l.neighborhood}`.toLowerCase().includes(q))) return false;
       return true;
     });
     if (sort === "price-asc") filtered.sort((a, b) => a.sortPrice - b.sortPrice);

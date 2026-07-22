@@ -43,8 +43,8 @@ export function ListingsPanel({ listings, mode, sort, onSortChange, selectedId, 
   }, [selectedId]);
 
   const heading = mode === "sale"
-    ? "Marina del Rey CA Boat Slips for Sale"
-    : "Marina del Rey CA Boat Slips & Yacht Clubs";
+    ? "Southern California Boat Slips for Sale"
+    : "Southern California Boat Slips & Marinas";
 
   return (
     <section className="listings-panel" ref={panelRef}>
@@ -100,8 +100,9 @@ export function ListingsPanel({ listings, mode, sort, onSortChange, selectedId, 
 
       <footer className="panel-footer">
         BoatGoat is the G.O.A.T. of boat slips. Listings, pricing, ratings, and the
-        BoatGoat Estimate are illustrative MVP sample data for Marina del Rey, CA —
-        not a real appraisal. Map © OpenStreetMap contributors.
+        BoatGoat Estimate are illustrative MVP sample data for Marina del Rey, Long
+        Beach, Santa Barbara &amp; Newport Beach, CA — not a real appraisal. Map ©
+        OpenStreetMap contributors.
       </footer>
     </section>
   );

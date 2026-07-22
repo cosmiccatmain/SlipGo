@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import L from "leaflet";
 import type { Listing } from "../data/listings";
 import { marinaPhoto } from "../lib/photos";
@@ -32,6 +32,7 @@ function popupHtml(l: Listing): string {
           <span class="map-popup-rating">★ ${l.rating.toFixed(1)}</span>
         </div>
         <div class="map-popup-name">${l.name}</div>
+        <div class="map-popup-hood">${l.neighborhood}</div>
         <div class="map-popup-meta">${meta}</div>
         <div class="map-popup-est">
           <span>Est. ${formatEstimate(l, est.fairValue)}</span>
@@ -47,8 +48,25 @@ export function MapView({ listings, hoveredId, selectedId, selectNonce, onSelect
   const markersRef = useRef<Map<string, L.Marker>>(new Map());
   const hoveredRef = useRef<string | null>(null);
   const selectedRef = useRef<string | null>(null);
+  const listingsRef = useRef<Listing[]>(listings);
+  const sizedRef = useRef(false);
   hoveredRef.current = hoveredId;
   selectedRef.current = selectedId;
+  listingsRef.current = listings;
+
+  // Frame the map around exactly the listings currently shown, so the pins
+  // always make it obvious which harbor each slip is in.
+  const fitToListings = useCallback(() => {
+    const map = mapRef.current;
+    const ls = listingsRef.current;
+    if (!map || ls.length === 0) return;
+    if (ls.length === 1) {
+      map.setView([ls[0].lat, ls[0].lon], 15);
+      return;
+    }
+    const bounds = L.latLngBounds(ls.map((l) => [l.lat, l.lon] as [number, number]));
+    map.fitBounds(bounds, { padding: [64, 64], maxZoom: 15 });
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -70,15 +88,16 @@ export function MapView({ listings, hoveredId, selectedId, selectNonce, onSelect
     mapRef.current = map;
 
     // The container can be 0x0 on first paint / when hidden behind the mobile
-    // toggle. Recenter once real size arrives and on any later layout change.
-    let sized = false;
+    // toggle. Fit to the listings once real size arrives, invalidate afterwards.
     const ro = new ResizeObserver(() => {
       const el = containerRef.current;
       if (!el || el.clientWidth === 0 || el.clientHeight === 0) return;
       map.invalidateSize();
-      if (!sized) {
-        sized = true;
-        map.setView(HARBOR_CENTER, HARBOR_ZOOM);
+      if (!sizedRef.current) {
+        sizedRef.current = true;
+        // Defer one frame so the container has its final size before fitting
+        // (avoids a transient over-zoom when the mobile map first appears).
+        requestAnimationFrame(() => fitToListings());
       }
     });
     ro.observe(containerRef.current);
@@ -118,11 +137,14 @@ export function MapView({ listings, hoveredId, selectedId, selectNonce, onSelect
       markersRef.current.set(l.id, marker);
     });
 
-    // Keep the current selection's popup open after a rebuild.
+    // Keep the current selection's popup open after a rebuild; otherwise the
+    // visible set just changed (filter / search / region), so reframe the map.
     if (selectedRef.current) {
       markersRef.current.get(selectedRef.current)?.openPopup();
+    } else if (sizedRef.current) {
+      fitToListings();
     }
-  }, [listings, onSelect]);
+  }, [listings, onSelect, fitToListings]);
 
   // Card hover -> grow the matching pin.
   useEffect(() => {

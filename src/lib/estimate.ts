@@ -1,4 +1,4 @@
-import type { Listing } from "../data/listings";
+import type { Listing, Region } from "../data/listings";
 import { allListings } from "../data/listings";
 
 // ── BoatGoat Estimate ────────────────────────────────────────────────────────
@@ -28,9 +28,19 @@ export interface Estimate {
   source: "heuristic" | "ai";
 }
 
-// Real harbor anchor points (from the OSM export).
-const CHACE_PARK = { lat: 33.9759, lon: -118.4464 }; // central dining / park hub
-const HARBOR_MOUTH = { lat: 33.9705, lon: -118.4497 }; // channel to open ocean
+// Per-region anchor points: the harbor's central hub and its mouth to open
+// ocean. The estimate rewards proximity to both, RELATIVE TO THE SAME HARBOR —
+// so a Newport slip is judged against Newport, not against Marina del Rey.
+interface RegionAnchor {
+  hub: { lat: number; lon: number };
+  mouth: { lat: number; lon: number };
+}
+const REGION_ANCHORS: Record<Region, RegionAnchor> = {
+  mdr: { hub: { lat: 33.9759, lon: -118.4464 }, mouth: { lat: 33.9705, lon: -118.4497 } },
+  "long-beach": { hub: { lat: 33.757, lon: -118.15 }, mouth: { lat: 33.744, lon: -118.117 } },
+  "santa-barbara": { hub: { lat: 34.4038, lon: -119.6908 }, mouth: { lat: 34.401, lon: -119.6885 } },
+  newport: { hub: { lat: 33.612, lon: -117.9 }, mouth: { lat: 33.5936, lon: -117.8807 } },
+};
 
 // Amenities that measurably raise desirability / ease of use.
 const VALUED_AMENITIES = new Set([
@@ -57,11 +67,12 @@ function distKm(lat: number, lon: number, b: { lat: number; lon: number }) {
   return Math.hypot(dLat, dLon);
 }
 
-/** 0.90–1.15: closer to the central hub + easy ocean access = more desirable. */
+/** 0.90–1.15: closer to its harbor's central hub + easy ocean access = more desirable. */
 function locationMultiplier(l: Listing): number {
-  const chace = clamp(distKm(l.lat, l.lon, CHACE_PARK) / 1.2, 0, 1);
-  const mouth = clamp(distKm(l.lat, l.lon, HARBOR_MOUTH) / 1.6, 0, 1);
-  return 1.15 - 0.18 * chace - 0.07 * mouth;
+  const anchor = REGION_ANCHORS[l.region] ?? REGION_ANCHORS.mdr;
+  const hub = clamp(distKm(l.lat, l.lon, anchor.hub) / 1.2, 0, 1);
+  const mouth = clamp(distKm(l.lat, l.lon, anchor.mouth) / 1.6, 0, 1);
+  return 1.15 - 0.18 * hub - 0.07 * mouth;
 }
 
 /** 1.00–1.20: each valued amenity adds ~3%. */

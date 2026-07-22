@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { events, type Listing } from "../data/listings";
 import { marinaPhoto } from "../lib/photos";
 import { getEstimate, formatEstimate } from "../lib/estimate";
@@ -42,7 +43,11 @@ export function ListingDetail({ listing, onClose }: Props) {
   const aiConfigured = !!server?.configured.ai;
   const offline = !serverLoading && server === null; // no serverless backend reachable
 
-  const heroPhoto = place?.photos?.[0] ?? marinaPhoto(listing.photoSeed);
+  const realPhoto = place?.photos?.[0] ?? null;
+  const [heroLoaded, setHeroLoaded] = useState(false);
+  useEffect(() => {
+    setHeroLoaded(false);
+  }, [realPhoto]);
   const displayRating = place?.rating ?? listing.rating;
   const displayCount = place?.reviewCount ?? listing.reviewCount;
 
@@ -67,7 +72,22 @@ export function ListingDetail({ listing, onClose }: Props) {
       </div>
 
       <div className="detail-scroll">
-        <img className="detail-hero" src={heroPhoto} alt={listing.name} />
+        <div className="detail-hero-wrap">
+          {realPhoto ? (
+            <img
+              className={"detail-hero" + (heroLoaded ? " loaded" : "")}
+              src={realPhoto}
+              alt={listing.name}
+              onLoad={() => setHeroLoaded(true)}
+            />
+          ) : !serverLoading ? (
+            // Loaded, but no real photo available — fall back to the illustration.
+            <img className="detail-hero loaded" src={marinaPhoto(listing.photoSeed)} alt={listing.name} />
+          ) : null}
+          {(serverLoading && !realPhoto) || (realPhoto && !heroLoaded) ? (
+            <div className="detail-hero skeleton" />
+          ) : null}
+        </div>
 
         {place && place.photos.length > 1 && (
           <div className="photo-strip">
@@ -88,6 +108,12 @@ export function ListingDetail({ listing, onClose }: Props) {
           </div>
         </div>
         <h2 className="detail-name">{listing.name}</h2>
+        <div className="detail-neighborhood">
+          <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+            <path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1112 6.5a2.5 2.5 0 010 5z" fill="currentColor" />
+          </svg>
+          {listing.neighborhood}
+        </div>
         <div className="detail-address">{listing.address}</div>
 
         <div className="detail-estimate">

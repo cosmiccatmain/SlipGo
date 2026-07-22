@@ -111,7 +111,7 @@ export function FilterBar({ filters, onChange, query, onQueryChange, mode, onToa
         <input
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
-          placeholder="Marina del Rey, CA"
+          placeholder="Marina del Rey, Long Beach, Newport…"
           aria-label="Search marinas"
         />
         {query ? (
