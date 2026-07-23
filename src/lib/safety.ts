@@ -25,6 +25,15 @@ const REGION_SAFETY_SOURCE: Record<Region, string> = {
   "long-beach": "Long Beach Police Department",
   "santa-barbara": "Santa Barbara Police Department",
   newport: "Newport Beach Police Department",
+  ventura: "Ventura Police Department",
+  "channel-islands": "Oxnard PD · Channel Islands Harbor Patrol",
+  redondo: "Redondo Beach Police Department",
+  "san-pedro": "LAPD — Harbor Division",
+  huntington: "Huntington Beach Police Department",
+  "dana-point": "O.C. Sheriff — Dana Point Harbor Patrol",
+  oceanside: "Oceanside PD — Harbor Unit",
+  "san-diego": "San Diego Harbor Police",
+  catalina: "L.A. County Sheriff — Avalon Station",
 };
 
 export function scoreToGrade(score: number): string {

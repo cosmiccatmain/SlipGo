@@ -4,6 +4,7 @@ import { marinaPhoto } from "../lib/photos";
 import { getEstimate, formatEstimate } from "../lib/estimate";
 import { useEnrichment } from "../lib/enrich";
 import { getSafety } from "../lib/safety";
+import { getTier, hasFeature } from "../lib/membership";
 
 interface Props {
   listing: Listing;
@@ -50,6 +51,9 @@ export function ListingDetail({ listing, onClose }: Props) {
   const summary = server?.summary ?? null;
   const websiteUrl = place?.website ?? listing.website ?? null;
   const safety = getSafety(listing);
+  const tier = getTier();
+  const canSafety = hasFeature(tier, "safety");
+  const canNeighbors = hasFeature(tier, "slipNeighbors");
   // Official goaty rating blends the AI score with safety once crime data is
   // wired (currently safety.ready is false, so it's just the AI score).
   const officialScore = summary
@@ -247,14 +251,31 @@ export function ListingDetail({ listing, onClose }: Props) {
             </div>
 
             <div className="cond-card">
-              <div className="cond-top"><b>Slip neighbors</b></div>
-              <div className="cond-muted">Provided by the marina operator — not public data.</div>
+              <div className="cond-top">
+                <b>Slip neighbors</b>
+                <span className="tier-chip plus">Plus</span>
+              </div>
+              {canNeighbors ? (
+                <div className="cond-muted">Provided by the marina operator — not public data.</div>
+              ) : (
+                <div className="tier-note">
+                  A BoatGoat Plus feature — see who's docked around you.
+                </div>
+              )}
             </div>
           </div>
         </section>
 
         <section className="detail-section">
-          <h3>Safety rating</h3>
+          <h3>
+            Safety rating <span className="tier-chip plus">Plus</span>
+          </h3>
+          {!canSafety ? (
+            <div className="tier-note">
+              Crime &amp; safety ratings are a BoatGoat Plus feature. Source when
+              live: {safety.source}.
+            </div>
+          ) : (
           <div className="safety-card">
             <div className="safety-head">
               <div className={"safety-grade" + (safety.ready ? "" : " pending")}>
@@ -287,6 +308,7 @@ export function ListingDetail({ listing, onClose }: Props) {
               </p>
             )}
           </div>
+          )}
         </section>
 
         <section className="detail-section">

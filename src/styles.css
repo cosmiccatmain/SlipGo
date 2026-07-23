@@ -6,6 +6,10 @@
   --blue-tint: #eef5fd;
   --teal: #2fa98a;
   --teal-dark: #1f8f73;
+  --plus: #2fa98a; /* BoatGoat Plus theme (green) */
+  --plus-tint: rgba(47, 169, 138, 0.12);
+  --pro: #d64545; /* BoatGoat Pro theme (red) */
+  --pro-tint: rgba(214, 69, 69, 0.12);
   --amber: #b06a12;
   --amber-tint: rgba(198, 121, 26, 0.14);
   --gold: #f4b740;
@@ -598,30 +602,37 @@ button {
 
 .range {
   position: relative;
-  height: 22px;
-  margin: 0 11px; /* keeps the handles clear of the popover edges */
+  height: 24px;
+  margin: 0 12px; /* keeps the handles clear of the popover edges */
 }
 
+/* Same look as the slip-length slider: dark rounded-rect track… */
 .range-rail {
   position: absolute;
   top: 50%;
   left: 0;
   right: 0;
-  height: 6px;
+  height: 16px;
   transform: translateY(-50%);
-  background: var(--border-light);
-  border-radius: 999px;
+  background: #140f1e;
+  border-radius: 9px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.55);
 }
 
+/* …with the neon dotted purple→magenta fill between the two handles. */
 .range-fill {
   position: absolute;
   top: 50%;
-  height: 6px;
+  height: 16px;
   transform: translateY(-50%);
   left: var(--a, 0%);
   right: calc(100% - var(--b, 100%));
-  background: linear-gradient(90deg, #5b4d9e, #7c5cdb);
-  border-radius: 999px;
+  background-color: #3b1f6e;
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.3) 0.9px, transparent 1.3px),
+    linear-gradient(90deg, #3b1f6e 0%, #7b3fb0 55%, #d06fdc 100%);
+  background-size: 5px 5px, 100% 100%;
+  border-radius: 9px;
 }
 
 /* Both inputs overlap the full width; only their thumbs catch pointer events. */
@@ -630,7 +641,7 @@ button {
   top: 0;
   left: 0;
   width: 100%;
-  height: 22px;
+  height: 24px;
   margin: 0;
   background: transparent;
   pointer-events: none;
@@ -643,47 +654,54 @@ button {
 }
 
 .range-input::-webkit-slider-runnable-track {
-  height: 22px;
+  height: 24px;
   background: transparent;
 }
 
 .range-input::-moz-range-track {
-  height: 22px;
+  height: 24px;
   background: transparent;
 }
 
+/* Rounded-square pearl knobs, same as the slip-length slider. */
 .range-input::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #fff;
-  border: 2px solid #7c5cdb;
-  box-shadow: 0 2px 5px rgba(11, 44, 77, 0.3);
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  background: radial-gradient(circle at 34% 30%, #ffffff 0%, #f2edfb 45%, #d9cdee 100%);
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.9);
+  border: none;
   cursor: pointer;
   pointer-events: auto;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
 .range-input::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #fff;
-  border: 2px solid #7c5cdb;
-  box-shadow: 0 2px 5px rgba(11, 44, 77, 0.3);
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  background: radial-gradient(circle at 34% 30%, #ffffff 0%, #f2edfb 45%, #d9cdee 100%);
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.9);
+  border: none;
   cursor: pointer;
   pointer-events: auto;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
 .range-input::-webkit-slider-thumb:hover {
-  transform: scale(1.12);
+  transform: scale(1.08);
 }
 
 .range-input::-webkit-slider-thumb:active {
-  transform: scale(1.2);
-  box-shadow: 0 3px 9px rgba(124, 92, 219, 0.5);
+  transform: scale(1.14);
+  box-shadow: 0 5px 12px rgba(124, 63, 176, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+
+.range-input:active::-moz-range-thumb {
+  transform: scale(1.14);
+  box-shadow: 0 5px 12px rgba(124, 63, 176, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.9);
 }
 
 .filter-spacer {
@@ -1550,6 +1568,148 @@ button {
 
 .detail-website svg {
   flex-shrink: 0;
+}
+
+/* ── Membership tier chips (Plus = green, Pro = red) ─────────────────────── */
+.tier-chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+
+.tier-chip.plus {
+  background: var(--plus-tint);
+  color: var(--plus);
+}
+
+.tier-chip.pro {
+  background: var(--pro-tint);
+  color: var(--pro);
+}
+
+/* Free-tier note shown where gated content would be. */
+.tier-note {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--plus);
+  background: var(--plus-tint);
+  border-radius: 10px;
+  padding: 10px 12px;
+  line-height: 1.45;
+}
+
+.tier-note.pro {
+  color: var(--pro);
+  background: var(--pro-tint);
+}
+
+/* ── BoatGoat Trips ──────────────────────────────────────────────────────── */
+.logo-trips {
+  color: var(--plus); /* ONLY "Trips" is green */
+  margin-left: 7px;
+}
+
+.trips-main {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background: #fff;
+}
+
+.trips-view {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 28px 20px 48px;
+}
+
+.trips-head h1 {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  color: var(--navy);
+}
+
+.trips-green {
+  color: var(--plus);
+}
+
+.trips-head p {
+  margin-top: 8px;
+  font-size: 14.5px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.trip-card {
+  margin-top: 18px;
+  border: 1px solid var(--border-light);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: var(--shadow-card);
+}
+
+.trip-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.trip-top h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--navy);
+}
+
+.trip-tagline {
+  margin-top: 5px;
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.trip-route {
+  margin-top: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--blue);
+  line-height: 1.6;
+}
+
+.trip-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-light);
+  font-size: 13.5px;
+  color: var(--text);
+}
+
+.trip-stats b {
+  font-weight: 800;
+}
+
+.trip-stats small {
+  color: var(--faint);
+}
+
+.trip-card .tier-note {
+  margin-top: 12px;
+}
+
+.trips-foot {
+  margin-top: 22px;
+  font-size: 12.5px;
+  color: var(--faint);
+  line-height: 1.5;
 }
 
 /* ── Safety rating ────────────────────────────────────────────────────────── */

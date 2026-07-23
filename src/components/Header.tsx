@@ -6,6 +6,9 @@ export type NavKey = "rent" | "buy" | "guest" | "yacht";
 interface Props {
   activeNav: NavKey;
   onNav: (key: NavKey) => void;
+  /** BoatGoat Trips mode — logo gains a green "Trips" while active. */
+  tripsActive: boolean;
+  onTrips: () => void;
   onSignIn: () => void;
   onToast: (msg: string) => void;
 }
@@ -17,7 +20,7 @@ const NAV_ITEMS: { key: NavKey; label: string }[] = [
   { key: "yacht", label: "Yacht clubs" },
 ];
 
-export function Header({ activeNav, onNav, onSignIn, onToast }: Props) {
+export function Header({ activeNav, onNav, tripsActive, onTrips, onSignIn, onToast }: Props) {
   const [eventsOpen, setEventsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -38,12 +41,18 @@ export function Header({ activeNav, onNav, onSignIn, onToast }: Props) {
         {NAV_ITEMS.map((item) => (
           <button
             key={item.key}
-            className={"nav-link" + (activeNav === item.key ? " active" : "")}
+            className={"nav-link" + (!tripsActive && activeNav === item.key ? " active" : "")}
             onClick={() => onNav(item.key)}
           >
             {item.label}
           </button>
         ))}
+        <button
+          className={"nav-link" + (tripsActive ? " active" : "")}
+          onClick={onTrips}
+        >
+          Trips
+        </button>
         <div className="nav-menu" ref={menuRef}>
           <button
             className={"nav-link nav-button" + (eventsOpen ? " open" : "")}
@@ -75,6 +84,7 @@ export function Header({ activeNav, onNav, onSignIn, onToast }: Props) {
         <img src="/logo-mark.png" alt="" className="logo-mark" />
         <span className="logo-word">
           <span className="logo-boat">Boat</span><span className="logo-goat-word">Goat</span>
+          {tripsActive && <span className="logo-trips">Trips</span>}
         </span>
       </button>
 

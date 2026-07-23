@@ -100,9 +100,8 @@ export function ListingsPanel({ listings, mode, sort, onSortChange, selectedId, 
 
       <footer className="panel-footer">
         BoatGoat is the G.O.A.T. of boat slips. Listings, pricing, ratings, and the
-        BoatGoat Estimate are illustrative MVP sample data for Marina del Rey, Long
-        Beach, Santa Barbara &amp; Newport Beach, CA — not a real appraisal. Map ©
-        OpenStreetMap contributors.
+        BoatGoat Estimate are illustrative MVP sample data for Southern California
+        harbors — not a real appraisal. Map © OpenStreetMap contributors.
       </footer>
     </section>
   );

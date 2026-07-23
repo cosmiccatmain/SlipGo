@@ -6,6 +6,7 @@ import { MapView } from "./components/MapView";
 import { SignInModal } from "./components/SignInModal";
 import { Toast } from "./components/Toast";
 import { ListingDetail } from "./components/ListingDetail";
+import { TripsView } from "./components/TripsView";
 import { allListings, rentListings, saleListings, type ListingType, type ListingMode } from "./data/listings";
 
 const ALL_TYPES: ListingType[] = ["marina", "guest-dock", "yacht-club"];
@@ -32,6 +33,7 @@ export default function App() {
   const [signInOpen, setSignInOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [detailId, setDetailId] = useState<string | null>(null);
+  const [view, setView] = useState<"search" | "trips">("search");
 
   // Which top-nav item is highlighted, derived from mode + type filter.
   const activeNav: NavKey = useMemo(() => {
@@ -42,6 +44,7 @@ export default function App() {
   }, [mode, filters.types]);
 
   const handleNav = useCallback((key: NavKey) => {
+    setView("search");
     setSelectedId(null);
     setMobileView("list");
     setFilters((f) => ({ ...f, minPrice: null, maxPrice: null }));
@@ -99,53 +102,63 @@ export default function App() {
       <Header
         activeNav={activeNav}
         onNav={handleNav}
+        tripsActive={view === "trips"}
+        onTrips={() => setView("trips")}
         onSignIn={() => setSignInOpen(true)}
         onToast={setToast}
       />
-      <FilterBar
-        filters={filters}
-        onChange={setFilters}
-        query={query}
-        onQueryChange={setQuery}
-        mode={mode}
-        onToast={setToast}
-      />
-      <main className="split">
-        <MapView
-          listings={visible}
-          hoveredId={hoveredId}
-          selectedId={selectedId}
-          selectNonce={selectNonce}
-          onOpen={openDetail}
-        />
-        <ListingsPanel
-          listings={visible}
-          mode={mode}
-          sort={sort}
-          onSortChange={setSort}
-          selectedId={selectedId}
-          onHover={setHoveredId}
-          onOpen={openDetail}
-        />
-        {detailListing && (
-          <ListingDetail listing={detailListing} onClose={() => setDetailId(null)} />
-        )}
-      </main>
+      {view === "trips" ? (
+        <main className="trips-main">
+          <TripsView />
+        </main>
+      ) : (
+        <>
+          <FilterBar
+            filters={filters}
+            onChange={setFilters}
+            query={query}
+            onQueryChange={setQuery}
+            mode={mode}
+            onToast={setToast}
+          />
+          <main className="split">
+            <MapView
+              listings={visible}
+              hoveredId={hoveredId}
+              selectedId={selectedId}
+              selectNonce={selectNonce}
+              onOpen={openDetail}
+            />
+            <ListingsPanel
+              listings={visible}
+              mode={mode}
+              sort={sort}
+              onSortChange={setSort}
+              selectedId={selectedId}
+              onHover={setHoveredId}
+              onOpen={openDetail}
+            />
+            {detailListing && (
+              <ListingDetail listing={detailListing} onClose={() => setDetailId(null)} />
+            )}
+          </main>
 
-      <button
-        className="mobile-toggle"
-        onClick={() => setMobileView((v) => (v === "map" ? "list" : "map"))}
-      >
-        {mobileView === "map" ? (
-          <>
-            <span aria-hidden="true">☰</span> List
-          </>
-        ) : (
-          <>
-            <span aria-hidden="true">▦</span> Map
-          </>
-        )}
-      </button>
+          <button
+            className="mobile-toggle"
+            onClick={() => setMobileView((v) => (v === "map" ? "list" : "map"))}
+          >
+            {mobileView === "map" ? (
+              <>
+                <span aria-hidden="true">☰</span> List
+              </>
+            ) : (
+              <>
+                <span aria-hidden="true">▦</span> Map
+              </>
+            )}
+          </button>
+        </>
+      )}
 
       <SignInModal open={signInOpen} onClose={() => setSignInOpen(false)} />
       <Toast message={toast} onDone={() => setToast(null)} />

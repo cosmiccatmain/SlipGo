@@ -40,6 +40,15 @@ const REGION_ANCHORS: Record<Region, RegionAnchor> = {
   "long-beach": { hub: { lat: 33.757, lon: -118.15 }, mouth: { lat: 33.744, lon: -118.117 } },
   "santa-barbara": { hub: { lat: 34.4038, lon: -119.6908 }, mouth: { lat: 34.401, lon: -119.6885 } },
   newport: { hub: { lat: 33.612, lon: -117.9 }, mouth: { lat: 33.5936, lon: -117.8807 } },
+  ventura: { hub: { lat: 34.2455, lon: -119.2645 }, mouth: { lat: 34.2402, lon: -119.2633 } },
+  "channel-islands": { hub: { lat: 34.167, lon: -119.226 }, mouth: { lat: 34.155, lon: -119.222 } },
+  redondo: { hub: { lat: 33.8465, lon: -118.3945 }, mouth: { lat: 33.843, lon: -118.397 } },
+  "san-pedro": { hub: { lat: 33.723, lon: -118.279 }, mouth: { lat: 33.708, lon: -118.247 } },
+  huntington: { hub: { lat: 33.718, lon: -118.067 }, mouth: { lat: 33.731, lon: -118.096 } },
+  "dana-point": { hub: { lat: 33.461, lon: -117.698 }, mouth: { lat: 33.457, lon: -117.692 } },
+  oceanside: { hub: { lat: 33.205, lon: -117.396 }, mouth: { lat: 33.207, lon: -117.401 } },
+  "san-diego": { hub: { lat: 32.72, lon: -117.21 }, mouth: { lat: 32.687, lon: -117.227 } },
+  catalina: { hub: { lat: 33.348, lon: -118.323 }, mouth: { lat: 33.3495, lon: -118.32 } },
 };
 
 // Amenities that measurably raise desirability / ease of use.
