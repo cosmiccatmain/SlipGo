@@ -49,7 +49,7 @@ export interface Listing {
   website?: string;
   /**
    * Transient/overnight rate in $ per foot per night (guest docks & moorings).
-   * Powers the BoatGoat Trips cost estimator.
+   * Powers the SlipGo Trips cost estimator.
    */
   nightlyPerFt?: number;
 }

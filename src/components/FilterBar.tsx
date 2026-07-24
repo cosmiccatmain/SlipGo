@@ -96,7 +96,7 @@ export function FilterBar({ filters, onChange, query, onQueryChange, mode, onToa
   const saveSearch = () => {
     try {
       localStorage.setItem(
-        "boatgoat.savedSearch",
+        "slipgo.savedSearch",
         JSON.stringify({
           mode,
           query,

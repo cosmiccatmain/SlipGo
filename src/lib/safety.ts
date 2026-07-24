@@ -4,7 +4,7 @@ import { REGIONS } from "../data/regions";
 // ── Safety / crime rating (scaffold) ─────────────────────────────────────────
 // Prepared now, honest until a real data source is wired: `ready` stays false
 // and no score is invented. When a per-harbor crime feed is connected, populate
-// `score`/`grade` here and the UI + the official goaty rating light up
+// `score`/`grade` here and the UI + the official Skipper rating light up
 // automatically (ListingDetail blends it into the overall score when ready).
 
 export interface SafetyInfo {

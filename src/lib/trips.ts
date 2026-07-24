@@ -2,7 +2,7 @@ import { rentListings } from "../data/listings";
 import { REGIONS, type Region } from "../data/regions";
 import { TIER_RANK, type Tier } from "./membership";
 
-// ── BoatGoat Trips ───────────────────────────────────────────────────────────
+// ── SlipGo Trips ───────────────────────────────────────────────────────────
 // Book a slip at every stop of a coastal cruise. v1 ships the planning engine
 // and curated itineraries; the multi-slip booking flow arrives in a later pass.
 // Curated trips are a Plus feature; custom trip building / full access is Pro.

@@ -61,7 +61,7 @@ export function SignInModal({ open, onClose }: Props) {
         className="modal"
         role="dialog"
         aria-modal="true"
-        aria-label={mode === "signup" ? "Create a BoatGoat account" : "Sign in to BoatGoat"}
+        aria-label={mode === "signup" ? "Create a SlipGo account" : "Sign in to SlipGo"}
         onClick={(e) => e.stopPropagation()}
       >
         <button className="modal-close" aria-label="Close" onClick={onClose}>
@@ -73,7 +73,7 @@ export function SignInModal({ open, onClose }: Props) {
             {mode === "signup" ? "Create your account" : "Welcome back"}
           </div>
           <div className="modal-sub">
-            Save searches, favorite slips, and plan Trips across Southern California.
+            Save searches, favorite slips, and plan Trips across California.
           </div>
         </div>
 

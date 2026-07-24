@@ -92,7 +92,7 @@ export function TripsView() {
     <div className="trips-view">
       <header className="trips-hero">
         <h1>
-          BoatGoat <span className="trips-green">Trips</span>
+          SlipGo <span className="trips-green">Trips</span>
         </h1>
         <p>
           Cruise California with a slip waiting at every stop. Times come from{" "}
@@ -183,7 +183,7 @@ export function TripsView() {
                 </div>
 
                 <div className="trip-ai">
-                  <span className="ai-badge">goaty</span>
+                  <span className="ai-badge">Skipper</span>
                   {e?.summaryLoading !== false ? (
                     <div className="skel-lines">
                       <span className="skeleton" style={{ width: "100%" }} />
@@ -207,8 +207,8 @@ export function TripsView() {
             ) : (
               <div className={"tier-note" + (t.tier === "pro" ? " pro" : "")}>
                 {t.tier === "pro"
-                  ? "Route, timings and slip prices for this cruise are a BoatGoat Pro feature."
-                  : "Route, timings and slip prices are a BoatGoat Plus feature."}
+                  ? "Route, timings and slip prices for this cruise are a SlipGo Pro feature."
+                  : "Route, timings and slip prices are a SlipGo Plus feature."}
               </div>
             )}
           </article>
@@ -309,7 +309,7 @@ function TripDetail({
         </>
       ) : (
         <div className="tier-note pro">
-          Fuel &amp; pump-out planning along the route is a BoatGoat Pro feature.
+          Fuel &amp; pump-out planning along the route is a SlipGo Pro feature.
         </div>
       )}
     </div>
@@ -390,7 +390,7 @@ function CustomTripBuilder({
         </>
       ) : (
         <div className="tier-note pro">
-          Custom multi-stop trip building is a BoatGoat Pro feature.
+          Custom multi-stop trip building is a SlipGo Pro feature.
         </div>
       )}
     </section>

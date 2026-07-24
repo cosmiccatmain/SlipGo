@@ -1,6 +1,6 @@
 import { events } from "../data/listings";
 
-// BoatGoat Events — what's happening on the water, harbor by harbor.
+// SlipGo Events — what's happening on the water, harbor by harbor.
 // Event names are set in cursive black (see .event-name in styles.css).
 
 export function EventsView() {
@@ -8,10 +8,10 @@ export function EventsView() {
     <div className="events-view">
       <header className="events-hero">
         <h1>
-          BoatGoat <span className="events-script">Events</span>
+          SlipGo <span className="events-script">Events</span>
         </h1>
         <p>
-          Parades, races and festivals across Southern California harbors — plan a
+          Parades, races and festivals across California harbors — plan a
           slip around the ones worth showing up for.
         </p>
       </header>

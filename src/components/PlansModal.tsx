@@ -25,7 +25,7 @@ const PLANS: Plan[] = [
     price: "$0",
     cadence: "forever",
     blurb: "Search every slip in California.",
-    perks: ["All 99 listings & the map", "BoatGoat Estimate", "goaty AI summaries", "Live wind", "1 boat saved"],
+    perks: ["All 99 listings & the map", "SlipGo Estimate", "Skipper AI summaries", "Live wind", "1 boat saved"],
   },
   {
     tier: "plus",
@@ -85,7 +85,7 @@ export function PlansModal({ open, onClose, onToast }: Props) {
         className="modal plans-modal"
         role="dialog"
         aria-modal="true"
-        aria-label="Choose your BoatGoat plan"
+        aria-label="Choose your SlipGo plan"
         onClick={(e) => e.stopPropagation()}
       >
         <button className="modal-close" aria-label="Close" onClick={onClose}>

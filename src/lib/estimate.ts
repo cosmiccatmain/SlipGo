@@ -2,7 +2,7 @@ import type { Listing } from "../data/listings";
 import { allListings } from "../data/listings";
 import { REGIONS } from "../data/regions";
 
-// ── BoatGoat Estimate ────────────────────────────────────────────────────────
+// ── SlipGo Estimate ────────────────────────────────────────────────────────
 // A transparent, DETERMINISTIC fair-value estimate. No AI, no network.
 //
 // The estimate answers: "given this listing's location, ease of use, size and

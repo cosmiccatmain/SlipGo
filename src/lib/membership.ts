@@ -1,4 +1,4 @@
-// ── BoatGoat membership tiers ────────────────────────────────────────────────
+// ── SlipGo membership tiers ────────────────────────────────────────────────
 // Plus (green) and Pro (red) scaffolding. No accounts/billing yet: the current
 // tier lives in localStorage so features can be built and tested now, and a
 // real auth/subscription system can replace getTier() later without touching
@@ -31,7 +31,7 @@ export function hasFeature(tier: Tier, key: FeatureKey): boolean {
   return TIER_RANK[tier] >= TIER_RANK[FEATURE_TIER[key]];
 }
 
-const TIER_STORAGE_KEY = "boatgoat.tier";
+const TIER_STORAGE_KEY = "slipgo.tier";
 
 export function getTier(): Tier {
   try {

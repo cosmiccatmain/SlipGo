@@ -1,4 +1,4 @@
-# 🐐 BoatGoat
+# ⚓ SlipGo
 
 Zillow-style search for boat slips, marinas, and yacht clubs.
 MVP focused on **Marina del Rey, CA**.

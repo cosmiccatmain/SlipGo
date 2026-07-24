@@ -51,10 +51,10 @@ export function Header({ activeNav, onNav, view, onView, onPricing, onBoats, onS
         </button>
       </nav>
 
-      <button className="logo" onClick={() => onNav("rent")} aria-label="BoatGoat home">
+      <button className="logo" onClick={() => onNav("rent")} aria-label="SlipGo home">
         <img src="/logo-mark.png" alt="" className="logo-mark" />
         <span className="logo-word">
-          <span className="logo-boat">Boat</span><span className="logo-goat-word">Goat</span>
+          <span className="logo-slip">Slip</span><span className="logo-go">Go</span>
           {view === "trips" && <span className="logo-trips">Trips</span>}
           {view === "events" && <span className="logo-events">Events</span>}
         </span>

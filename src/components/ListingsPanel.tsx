@@ -43,8 +43,8 @@ export function ListingsPanel({ listings, mode, sort, onSortChange, selectedId, 
   }, [selectedId]);
 
   const heading = mode === "sale"
-    ? "Southern California Boat Slips for Sale"
-    : "Southern California Boat Slips & Marinas";
+    ? "California Boat Slips for Sale"
+    : "California Boat Slips & Marinas";
 
   return (
     <section className="listings-panel" ref={panelRef}>
@@ -92,16 +92,16 @@ export function ListingsPanel({ listings, mode, sort, onSortChange, selectedId, 
 
       {listings.length === 0 && (
         <div className="empty-state">
-          <div className="empty-goat">🐐</div>
+          <div className="empty-mark">⛵</div>
           <p>No listings match your filters.</p>
           <p className="empty-sub">Try widening your price range, slip length, or amenities.</p>
         </div>
       )}
 
       <footer className="panel-footer">
-        BoatGoat is the G.O.A.T. of boat slips. Listings, pricing, ratings, and the
-        BoatGoat Estimate are illustrative MVP sample data for Southern California
-        harbors — not a real appraisal. Map © OpenStreetMap contributors.
+        SlipGo — find your slip, anywhere in California. Listings, pricing,
+        ratings, and the SlipGo Estimate are illustrative MVP sample data — not a
+        real appraisal. Map © OpenStreetMap contributors.
       </footer>
     </section>
   );

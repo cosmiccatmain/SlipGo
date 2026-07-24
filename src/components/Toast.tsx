@@ -17,7 +17,7 @@ export function Toast({ message, onDone }: Props) {
   return (
     <div className="toast-wrap" role="status" aria-live="polite">
       <div className="toast">
-        <span className="toast-goat" aria-hidden="true">🐐</span>
+        <span className="toast-mark" aria-hidden="true">⚓</span>
         {message}
       </div>
     </div>

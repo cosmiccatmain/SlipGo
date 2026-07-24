@@ -6,9 +6,9 @@
   --blue-tint: #eef5fd;
   --teal: #2fa98a;
   --teal-dark: #1f8f73;
-  --plus: #2fa98a; /* BoatGoat Plus theme (green) */
+  --plus: #2fa98a; /* SlipGo Plus theme (green) */
   --plus-tint: rgba(47, 169, 138, 0.12);
-  --pro: #d64545; /* BoatGoat Pro theme (red) */
+  --pro: #d64545; /* SlipGo Pro theme (red) */
   --pro-tint: rgba(214, 69, 69, 0.12);
   --amber: #b06a12;
   --amber-tint: rgba(198, 121, 26, 0.14);
@@ -137,11 +137,11 @@ button {
   letter-spacing: -0.5px;
 }
 
-.logo-boat {
+.logo-slip {
   color: var(--navy);
 }
 
-.logo-goat-word {
+.logo-go {
   color: var(--blue);
 }
 
@@ -1283,7 +1283,7 @@ button {
   color: var(--muted);
 }
 
-.empty-goat {
+.empty-mark {
   font-size: 44px;
   margin-bottom: 10px;
 }
@@ -1474,7 +1474,7 @@ button {
   box-shadow: var(--shadow-pop);
 }
 
-.toast-goat {
+.toast-mark {
   font-size: 17px;
 }
 
@@ -1609,7 +1609,7 @@ button {
   background: var(--pro-tint);
 }
 
-/* ── BoatGoat Trips ──────────────────────────────────────────────────────── */
+/* ── SlipGo Trips ──────────────────────────────────────────────────────── */
 .logo-trips {
   color: var(--plus); /* ONLY "Trips" is green */
   margin-left: 7px;
@@ -1931,7 +1931,7 @@ button {
   }
 }
 
-/* ── BoatGoat Events ─────────────────────────────────────────────────────── */
+/* ── SlipGo Events ─────────────────────────────────────────────────────── */
 /* Cursive black is used in exactly one place: the "Events" word beside the
    logo in the header. Everything else stays in the normal type scale. */
 .logo-events {

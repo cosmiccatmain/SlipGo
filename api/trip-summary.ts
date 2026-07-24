@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
 // ── /api/trip-summary ────────────────────────────────────────────────────────
-// A short, grounded briefing for a BoatGoat Trips itinerary. Uses only the real
+// A short, grounded briefing for a SlipGo Trips itinerary. Uses only the real
 // route/wind figures the client computed — the model is told never to invent
 // conditions. Key stays server-side (OPENAI_API_KEY); returns
 // { configured, summary } and degrades honestly when unset.

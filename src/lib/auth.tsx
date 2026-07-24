@@ -15,7 +15,7 @@ import { listBoats, type Boat } from "./boats";
  * "Confirm email" enabled, sign-up returns no session — the user confirms by
  * email and arrives via sign-in instead.
  */
-const PLANS_SEEN_PREFIX = "boatgoat.plansSeen.";
+const PLANS_SEEN_PREFIX = "slipgo.plansSeen.";
 
 function hasSeenPlans(userId: string): boolean {
   try {

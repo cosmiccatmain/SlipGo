@@ -55,7 +55,7 @@ export function ListingDetail({ listing, onClose }: Props) {
   const tier = useTier();
   const canSafety = hasFeature(tier, "safety");
   const canNeighbors = hasFeature(tier, "slipNeighbors");
-  // Official goaty rating blends the AI score with safety once crime data is
+  // Official Skipper rating blends the AI score with safety once crime data is
   // wired (currently safety.ready is false, so it's just the AI score).
   const officialScore = summary
     ? safety.ready && safety.score !== null
@@ -170,7 +170,7 @@ export function ListingDetail({ listing, onClose }: Props) {
 
         <div className="detail-estimate">
           <div>
-            <span className="est-label">BoatGoat Estimate</span>
+            <span className="est-label">SlipGo Estimate</span>
             <div className="est-big">{formatEstimate(listing, est.fairValue)}</div>
           </div>
           <span className={"value-chip " + est.verdict}>{est.label}</span>
@@ -179,7 +179,7 @@ export function ListingDetail({ listing, onClose }: Props) {
         {/* AI overall take — grounded in real data, only when configured */}
         <section className="ai-take">
           <div className="ai-take-head">
-            <span className="ai-badge">goaty</span>
+            <span className="ai-badge">Skipper</span>
             {officialScore !== null && <span className="ai-score">{officialScore}<small>/100</small></span>}
           </div>
           {serverLoading ? (
@@ -260,7 +260,7 @@ export function ListingDetail({ listing, onClose }: Props) {
                 <div className="cond-muted">Provided by the marina operator — not public data.</div>
               ) : (
                 <div className="tier-note">
-                  A BoatGoat Plus feature — see who's docked around you.
+                  A SlipGo Plus feature — see who's docked around you.
                 </div>
               )}
             </div>
@@ -273,7 +273,7 @@ export function ListingDetail({ listing, onClose }: Props) {
           </h3>
           {!canSafety ? (
             <div className="tier-note">
-              Crime &amp; safety ratings are a BoatGoat Plus feature. Source when
+              Crime &amp; safety ratings are a SlipGo Plus feature. Source when
               live: {safety.source}.
             </div>
           ) : (
@@ -305,7 +305,7 @@ export function ListingDetail({ listing, onClose }: Props) {
             {!safety.ready && (
               <p className="safety-note">
                 Crime &amp; safety data is being wired in from {safety.source}. Once
-                live, this Safety score becomes part of the official goaty rating.
+                live, this Safety score becomes part of the official Skipper rating.
               </p>
             )}
           </div>
