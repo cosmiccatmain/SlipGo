@@ -9,6 +9,7 @@ interface Props {
   view: View;
   onView: (v: View) => void;
   onPricing: () => void;
+  onBoats: () => void;
   onSignIn: () => void;
   onToast: (msg: string) => void;
 }
@@ -20,7 +21,7 @@ const NAV_ITEMS: { key: NavKey; label: string }[] = [
   { key: "yacht", label: "Yacht clubs" },
 ];
 
-export function Header({ activeNav, onNav, view, onView, onPricing, onSignIn, onToast }: Props) {
+export function Header({ activeNav, onNav, view, onView, onPricing, onBoats, onSignIn, onToast }: Props) {
   const { user, tier, signOut } = useAuth();
   const inSearch = view === "search";
 
@@ -71,6 +72,9 @@ export function Header({ activeNav, onNav, view, onView, onPricing, onSignIn, on
         </button>
         {user ? (
           <div className="account-wrap">
+            <button className="nav-link" onClick={onBoats}>
+              My boats
+            </button>
             <span className="account-email" title={user.email ?? ""}>
               {user.email}
             </span>

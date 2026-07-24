@@ -24,8 +24,8 @@ const PLANS: Plan[] = [
     name: "Free",
     price: "$0",
     cadence: "forever",
-    blurb: "Search every slip on the coast.",
-    perks: ["All 36 listings & the map", "BoatGoat Estimate", "goaty AI summaries", "Live wind"],
+    blurb: "Search every slip in California.",
+    perks: ["All 99 listings & the map", "BoatGoat Estimate", "goaty AI summaries", "Live wind", "1 boat saved"],
   },
   {
     tier: "plus",
@@ -33,7 +33,13 @@ const PLANS: Plan[] = [
     price: "$14",
     cadence: "/mo",
     blurb: "The details that decide a slip.",
-    perks: ["Crime & Safety ratings", "Slip neighbors", "Curated Trips", "Saved-search alerts"],
+    perks: [
+      "Crime & Safety ratings",
+      "Slip neighbors",
+      "Curated Trips + slip prices",
+      "Wind-timed routes",
+      "3 boats saved",
+    ],
   },
   {
     tier: "pro",
@@ -41,7 +47,13 @@ const PLANS: Plan[] = [
     price: "$39",
     cadence: "/mo",
     blurb: "For liveaboards and long cruises.",
-    perks: ["Everything in Plus", "Custom multi-stop Trips", "Full Grand Tour routes", "Priority support"],
+    perks: [
+      "Everything in Plus",
+      "Build custom multi-stop trips",
+      "Fuel & pump-out planning",
+      "Full Grand Tour routes",
+      "Unlimited boats",
+    ],
   },
 ];
 

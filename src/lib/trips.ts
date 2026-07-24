@@ -1,4 +1,5 @@
-import { rentListings, type Region } from "../data/listings";
+import { rentListings } from "../data/listings";
+import { REGIONS, type Region } from "../data/regions";
 import { TIER_RANK, type Tier } from "./membership";
 
 // ── BoatGoat Trips ───────────────────────────────────────────────────────────
@@ -12,22 +13,13 @@ export interface Harbor {
   lon: number;
 }
 
-/** Waypoint per harbor (harbor entrance / anchorage, for leg distances). */
-export const HARBORS: Record<Region, Harbor> = {
-  "santa-barbara": { label: "Santa Barbara", lat: 34.4038, lon: -119.6908 },
-  ventura: { label: "Ventura", lat: 34.2455, lon: -119.2645 },
-  "channel-islands": { label: "Channel Islands (Oxnard)", lat: 34.167, lon: -119.226 },
-  mdr: { label: "Marina del Rey", lat: 33.9762, lon: -118.4505 },
-  redondo: { label: "Redondo Beach", lat: 33.8465, lon: -118.3945 },
-  "san-pedro": { label: "San Pedro", lat: 33.723, lon: -118.279 },
-  "long-beach": { label: "Long Beach", lat: 33.757, lon: -118.15 },
-  catalina: { label: "Catalina · Avalon", lat: 33.348, lon: -118.323 },
-  huntington: { label: "Huntington Harbour", lat: 33.718, lon: -118.067 },
-  newport: { label: "Newport Beach", lat: 33.612, lon: -117.9 },
-  "dana-point": { label: "Dana Point", lat: 33.461, lon: -117.698 },
-  oceanside: { label: "Oceanside", lat: 33.205, lon: -117.396 },
-  "san-diego": { label: "San Diego", lat: 32.72, lon: -117.21 },
-};
+/** Waypoint per harbor, derived from the region table. */
+export const HARBORS = Object.fromEntries(
+  (Object.keys(REGIONS) as Region[]).map((k) => [
+    k,
+    { label: REGIONS[k].label, lat: REGIONS[k].hub.lat, lon: REGIONS[k].hub.lon },
+  ]),
+) as Record<Region, Harbor>;
 
 const EARTH_RADIUS_NM = 3440.065;
 
@@ -191,11 +183,105 @@ export const CURATED_TRIPS: Itinerary[] = [
 const DEFAULT_NIGHTLY_PER_FT = 2;
 
 /** Cheapest listed transient ($/ft/night) in a harbor. */
-function nightlyRate(region: Region): number {
+export function nightlyRate(region: Region): number {
   const rates = rentListings
     .filter((l) => l.region === region && typeof l.nightlyPerFt === "number")
     .map((l) => l.nightlyPerFt as number);
   return rates.length ? Math.min(...rates) : DEFAULT_NIGHTLY_PER_FT;
+}
+
+/** The actual listing we'd price a night against, when we have one. */
+export function nightlyListing(region: Region) {
+  return (
+    rentListings
+      .filter((l) => l.region === region && typeof l.nightlyPerFt === "number")
+      .sort((a, b) => (a.nightlyPerFt ?? 0) - (b.nightlyPerFt ?? 0))[0] ?? null
+  );
+}
+
+/** Harbors on this route that can take on fuel or pump out — Pro planning. */
+export function serviceStops(t: Itinerary): { region: Region; fuel: boolean; pumpOut: boolean }[] {
+  return t.stops.map((s) => {
+    const here = rentListings.filter((l) => l.region === s.region);
+    return {
+      region: s.region,
+      fuel: here.some((l) => l.amenities.includes("Fuel dock")),
+      pumpOut: here.some((l) => l.amenities.includes("Pump-out")),
+    };
+  });
+}
+
+export interface LegDetail {
+  from: Region;
+  to: Region;
+  nm: number;
+  hours: number;
+  bearing: number;
+  wind?: LegWind;
+}
+
+/** Leg-by-leg breakdown for the trip detail view. */
+export function legDetails(
+  t: Itinerary,
+  knots = 7,
+  winds?: LegWind[] | null,
+): LegDetail[] {
+  const usable = !!winds && winds.length === t.stops.length - 1;
+  const out: LegDetail[] = [];
+  for (let i = 1; i < t.stops.length; i++) {
+    const fromR = t.stops[i - 1].region;
+    const toR = t.stops[i].region;
+    const a = HARBORS[fromR];
+    const b = HARBORS[toR];
+    const nm = distanceNm(a, b);
+    const bearing = bearingDeg(a, b);
+    const wind = usable ? winds![i - 1] : undefined;
+    const speed = wind ? effectiveSpeed(knots, bearing, wind) : knots;
+    out.push({ from: fromR, to: toR, nm, hours: nm / speed, bearing, wind });
+  }
+  return out;
+}
+
+export interface StopCost {
+  region: Region;
+  nights: number;
+  perFt: number;
+  total: number;
+  listingName: string | null;
+}
+
+/** Per-stop slip pricing for a given boat length. */
+export function stopCosts(t: Itinerary, loaFt: number): StopCost[] {
+  return t.stops
+    .filter((s) => s.nights > 0)
+    .map((s) => {
+      const perFt = nightlyRate(s.region);
+      const l = nightlyListing(s.region);
+      return {
+        region: s.region,
+        nights: s.nights,
+        perFt,
+        total: Math.round(s.nights * perFt * loaFt),
+        listingName: l?.name ?? null,
+      };
+    });
+}
+
+/** Compass label for a bearing, e.g. 200° → "SSW". */
+export function compassLabel(deg: number): string {
+  const pts = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+  return pts[Math.round(deg / 22.5) % 16];
+}
+
+/** Build a custom itinerary (Pro) from an ordered list of harbors. */
+export function buildCustomTrip(stops: TripStop[]): Itinerary {
+  return {
+    id: "custom",
+    name: "Your custom trip",
+    tagline: "Built from the harbors you picked.",
+    tier: "pro",
+    stops,
+  };
 }
 
 export interface TripStats {

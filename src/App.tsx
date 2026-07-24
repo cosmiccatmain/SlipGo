@@ -9,6 +9,7 @@ import { ListingDetail } from "./components/ListingDetail";
 import { TripsView } from "./components/TripsView";
 import { EventsView } from "./components/EventsView";
 import { PlansModal } from "./components/PlansModal";
+import { BoatsModal } from "./components/BoatsModal";
 import { useAuth } from "./lib/auth";
 import { allListings, rentListings, saleListings, type ListingType, type ListingMode } from "./data/listings";
 
@@ -38,15 +39,26 @@ export default function App() {
   const [detailId, setDetailId] = useState<string | null>(null);
   const [view, setView] = useState<View>("search");
   const [plansOpen, setPlansOpen] = useState(false);
+  const [boatsOpen, setBoatsOpen] = useState(false);
+  const [askBoatsNext, setAskBoatsNext] = useState(false);
   const { justSignedUp, clearJustSignedUp } = useAuth();
 
-  // Right after a successful sign-up, present the plans.
+  // First authenticated visit: pick a plan, then add your boats.
   useEffect(() => {
     if (justSignedUp) {
       setPlansOpen(true);
+      setAskBoatsNext(true);
       clearJustSignedUp();
     }
   }, [justSignedUp, clearJustSignedUp]);
+
+  const closePlans = useCallback(() => {
+    setPlansOpen(false);
+    if (askBoatsNext) {
+      setAskBoatsNext(false);
+      setBoatsOpen(true);
+    }
+  }, [askBoatsNext]);
 
   // Which top-nav item is highlighted, derived from mode + type filter.
   const activeNav: NavKey = useMemo(() => {
@@ -118,6 +130,7 @@ export default function App() {
         view={view}
         onView={setView}
         onPricing={() => setPlansOpen(true)}
+        onBoats={() => setBoatsOpen(true)}
         onSignIn={() => setSignInOpen(true)}
         onToast={setToast}
       />
@@ -179,7 +192,8 @@ export default function App() {
       )}
 
       <SignInModal open={signInOpen} onClose={() => setSignInOpen(false)} />
-      <PlansModal open={plansOpen} onClose={() => setPlansOpen(false)} onToast={setToast} />
+      <PlansModal open={plansOpen} onClose={closePlans} onToast={setToast} />
+      <BoatsModal open={boatsOpen} onClose={() => setBoatsOpen(false)} onToast={setToast} />
       <Toast message={toast} onDone={() => setToast(null)} />
     </div>
   );

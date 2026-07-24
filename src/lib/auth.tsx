@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase, fetchProfile, saveTier } from "./supabase";
 import { getTier as getLocalTier, setTier as setLocalTier, type Tier } from "./membership";
+import { listBoats, type Boat } from "./boats";
 
 // ── Auth + membership state ──────────────────────────────────────────────────
 // Signed in  → tier comes from the user's `profiles` row (source of truth).
@@ -35,6 +36,9 @@ function markPlansSeen(userId: string) {
 interface AuthState {
   user: User | null;
   tier: Tier;
+  /** The signed-in user's fleet (empty when signed out). */
+  boats: Boat[];
+  refreshBoats: () => Promise<void>;
   loading: boolean;
   /** True on a user's first authenticated visit, so the app shows the plans popup. */
   justSignedUp: boolean;
@@ -52,6 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [tier, setTierState] = useState<Tier>(() => getLocalTier());
   const [loading, setLoading] = useState(true);
   const [justSignedUp, setJustSignedUp] = useState(false);
+  const [boats, setBoats] = useState<Boat[]>([]);
 
   const applySession = useCallback(async (session: Session | null) => {
     const u = session?.user ?? null;
@@ -59,11 +64,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (u) {
       const profile = await fetchProfile(u.id);
       setTierState(profile?.tier ?? "free");
+      setBoats(await listBoats(u.id));
       if (!hasSeenPlans(u.id)) setJustSignedUp(true);
     } else {
       setTierState(getLocalTier());
+      setBoats([]);
     }
   }, []);
+
+  const refreshBoats = useCallback(async () => {
+    if (!user) return setBoats([]);
+    setBoats(await listBoats(user.id));
+  }, [user]);
 
   useEffect(() => {
     let alive = true;
@@ -98,6 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
     setUser(null);
+    setBoats([]);
     setTierState(getLocalTier());
   }, []);
 
@@ -114,6 +127,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({
       user,
       tier,
+      boats,
+      refreshBoats,
       loading,
       justSignedUp,
       clearJustSignedUp: () => {
@@ -125,7 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signOut,
       chooseTier,
     }),
-    [user, tier, loading, justSignedUp, signUp, signIn, signOut, chooseTier],
+    [user, tier, boats, refreshBoats, loading, justSignedUp, signUp, signIn, signOut, chooseTier],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

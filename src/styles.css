@@ -1931,18 +1931,16 @@ button {
   }
 }
 
-/* ── BoatGoat Events (event names in cursive black) ──────────────────────── */
-.logo-events,
-.events-script {
+/* ── BoatGoat Events ─────────────────────────────────────────────────────── */
+/* Cursive black is used in exactly one place: the "Events" word beside the
+   logo in the header. Everything else stays in the normal type scale. */
+.logo-events {
   font-family: "Snell Roundhand", "Apple Chancery", "Segoe Script", "Brush Script MT", cursive;
   color: #000;
   font-weight: 600;
   font-style: italic;
-}
-
-.logo-events {
   margin-left: 8px;
-  font-size: 1.08em;
+  font-size: 1.14em;
 }
 
 .events-view {
@@ -1959,7 +1957,7 @@ button {
 }
 
 .events-hero .events-script {
-  font-size: 1.15em;
+  color: var(--navy);
 }
 
 .events-hero p {
@@ -2023,14 +2021,11 @@ button {
   min-width: 0;
 }
 
-/* The event name itself — cursive, black. */
 .event-name {
-  font-family: "Snell Roundhand", "Apple Chancery", "Segoe Script", "Brush Script MT", cursive;
-  color: #000;
-  font-style: italic;
-  font-size: 24px;
-  font-weight: 600;
-  line-height: 1.2;
+  font-size: 16.5px;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1.3;
 }
 
 .event-meta {
@@ -2074,42 +2069,39 @@ button {
   max-width: 62ch;
 }
 
-.trip-timeline {
-  list-style: none;
-  margin: 14px 0 0;
-  padding: 0 0 0 4px;
-  border-left: 2px dashed var(--border);
-}
-
-.trip-stop {
-  position: relative;
+/* Route as a wrapping chain of harbours — no rails, no dots. */
+.trip-route-chain {
   display: flex;
-  align-items: baseline;
-  gap: 10px;
-  padding: 5px 0 5px 16px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin-top: 14px;
 }
 
-.trip-dot {
-  position: absolute;
-  left: -6px;
-  top: 11px;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--blue);
-  border: 2px solid #fff;
-  box-shadow: 0 0 0 1px var(--border);
+.trip-hop {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.trip-stop-name {
-  font-size: 14px;
+.trip-hop-name {
+  font-size: 13.5px;
   font-weight: 700;
-  color: var(--text);
+  color: var(--navy);
+  background: var(--blue-tint);
+  border-radius: 999px;
+  padding: 4px 11px;
 }
 
-.trip-stop-nights {
-  font-size: 12.5px;
-  color: var(--faint);
+.trip-hop-nights {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.trip-arrow {
+  color: var(--border);
+  font-size: 14px;
 }
 
 .trip-stat-grid {
@@ -2168,6 +2160,282 @@ button {
   .trip-stat-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+}
+
+/* ── Boats ───────────────────────────────────────────────────────────────── */
+.boats-modal {
+  max-width: 560px;
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+}
+
+.boat-list {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.boat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.boat-specs {
+  display: block;
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.boat-remove {
+  border: none;
+  background: none;
+  color: var(--pro);
+  font-size: 12.5px;
+  font-weight: 700;
+  font-family: var(--font);
+}
+
+.boat-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.boat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+@media (max-width: 520px) {
+  .boat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.fit-badge {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  border-radius: 999px;
+  padding: 3px 9px;
+  background: var(--plus-tint);
+  color: var(--plus);
+}
+
+.fit-badge.tight {
+  background: var(--amber-tint);
+  color: var(--amber);
+}
+
+.fit-badge\.too-small,
+.fit-badge.too-small {
+  background: var(--pro-tint);
+  color: var(--pro);
+}
+
+.fit-badge.roomy {
+  background: var(--blue-tint);
+  color: var(--blue);
+}
+
+/* ── Trips: boat bar, detail, builder ────────────────────────────────────── */
+.trip-boatbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  font-size: 13.5px;
+  color: var(--muted);
+  flex-wrap: wrap;
+}
+
+.trip-boatbar select {
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: var(--font);
+  font-size: 13.5px;
+  padding: 0 8px;
+  background: #fff;
+}
+
+.trip-boatbar-empty {
+  font-style: italic;
+}
+
+.trip-view-btn {
+  margin-top: 14px;
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 9px;
+  padding: 9px 14px;
+  font-size: 13.5px;
+  font-weight: 700;
+  font-family: var(--font);
+  color: var(--navy);
+  transition: background 0.14s ease, border-color 0.14s ease, color 0.14s ease;
+}
+
+.trip-view-btn:hover {
+  background: var(--blue-tint);
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+.trip-detail {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-light);
+}
+
+.trip-detail h3 {
+  font-size: 12.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--faint);
+  margin: 14px 0 8px;
+}
+
+.trip-detail h3:first-child {
+  margin-top: 0;
+}
+
+.leg-table {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.leg-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-light);
+  flex-wrap: wrap;
+}
+
+.leg-row:last-child {
+  border-bottom: none;
+}
+
+.leg-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.leg-sub {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.leg-figs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--muted);
+  flex-wrap: wrap;
+}
+
+.leg-wind {
+  color: var(--blue);
+  font-weight: 600;
+}
+
+.leg-total {
+  font-weight: 800;
+  color: var(--navy);
+}
+
+.leg-total-row {
+  background: var(--blue-tint);
+}
+
+.service-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.service-chip {
+  font-size: 12px;
+  border: 1px solid var(--border-light);
+  border-radius: 999px;
+  padding: 4px 10px;
+  color: var(--muted);
+}
+
+.service-chip b {
+  color: var(--teal-dark);
+  font-weight: 800;
+}
+
+.service-chip i {
+  color: var(--faint);
+}
+
+.trip-builder {
+  margin-top: 18px;
+  border: 1px dashed var(--border);
+  border-radius: 14px;
+  padding: 18px;
+}
+
+.builder-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.builder-row select {
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: var(--font);
+  font-size: 13.5px;
+  padding: 0 8px;
+  background: #fff;
+}
+
+.builder-add {
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: var(--pro);
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 700;
+  font-family: var(--font);
+  padding: 0 14px;
+}
+
+.builder-hint {
+  margin-top: 8px;
+  font-size: 12.5px;
+  color: var(--faint);
 }
 
 /* ── Safety rating ────────────────────────────────────────────────────────── */

@@ -3,6 +3,8 @@ import type { Listing } from "../data/listings";
 import { marinaPhoto } from "../lib/photos";
 import { getEstimate, formatEstimate } from "../lib/estimate";
 import { prefetchEnrichment, getCachedPhoto, onEnrichmentReady } from "../lib/enrich";
+import { useAuth } from "../lib/auth";
+import { FIT_LABEL, slipFit } from "../lib/boats";
 
 interface Props {
   listing: Listing;
@@ -23,6 +25,11 @@ export function ListingCard({ listing, index, selected, onHover, onOpen }: Props
   const badge = listing.mode === "sale" ? "For sale" : TYPE_BADGE[listing.type];
   const badgeClass = listing.mode === "sale" ? "sale" : listing.type;
   const est = getEstimate(listing);
+
+  // Informational only: we flag how a slip suits your boat but never hide
+  // listings because of it — plenty of people shop bigger on purpose.
+  const { boats } = useAuth();
+  const fit = boats.length > 0 ? slipFit(listing.maxLengthFt, boats[0].lengthFt) : null;
 
   // Real Google photo, lazy-loaded when the card scrolls into view. Falls back
   // to the illustration until (and unless) a real photo is available.
@@ -140,6 +147,7 @@ export function ListingCard({ listing, index, selected, onHover, onOpen }: Props
           </span>
         </div>
         <div className="card-specs">{specs}</div>
+        {fit && <span className={"fit-badge " + fit}>{FIT_LABEL[fit]}</span>}
         <div className="card-neighborhood">
           <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">
             <path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1112 6.5a2.5 2.5 0 010 5z" fill="currentColor" />

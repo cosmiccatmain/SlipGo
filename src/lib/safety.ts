@@ -1,4 +1,5 @@
-import type { Listing, Region } from "../data/listings";
+import type { Listing } from "../data/listings";
+import { REGIONS } from "../data/regions";
 
 // ── Safety / crime rating (scaffold) ─────────────────────────────────────────
 // Prepared now, honest until a real data source is wired: `ready` stays false
@@ -20,21 +21,7 @@ export interface SafetyInfo {
 
 // The real reporting authority for each harbor — where the crime data will come
 // from once ingested.
-const REGION_SAFETY_SOURCE: Record<Region, string> = {
-  mdr: "L.A. County Sheriff — Marina del Rey Station",
-  "long-beach": "Long Beach Police Department",
-  "santa-barbara": "Santa Barbara Police Department",
-  newport: "Newport Beach Police Department",
-  ventura: "Ventura Police Department",
-  "channel-islands": "Oxnard PD · Channel Islands Harbor Patrol",
-  redondo: "Redondo Beach Police Department",
-  "san-pedro": "LAPD — Harbor Division",
-  huntington: "Huntington Beach Police Department",
-  "dana-point": "O.C. Sheriff — Dana Point Harbor Patrol",
-  oceanside: "Oceanside PD — Harbor Unit",
-  "san-diego": "San Diego Harbor Police",
-  catalina: "L.A. County Sheriff — Avalon Station",
-};
+// The reporting agency for each harbor lives in the region table.
 
 export function scoreToGrade(score: number): string {
   if (score >= 90) return "A";
@@ -45,7 +32,7 @@ export function scoreToGrade(score: number): string {
 }
 
 export function getSafety(listing: Listing): SafetyInfo {
-  const source = REGION_SAFETY_SOURCE[listing.region];
+  const source = REGIONS[listing.region].safetySource;
   // No crime source wired yet — never fabricate a rating.
   return {
     ready: false,
