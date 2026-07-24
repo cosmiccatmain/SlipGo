@@ -1712,6 +1712,464 @@ button {
   line-height: 1.5;
 }
 
+/* ── Auth + account ──────────────────────────────────────────────────────── */
+.auth-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--border-light);
+  border-radius: 10px;
+  padding: 4px;
+  margin: 0 0 16px;
+}
+
+.auth-tab {
+  flex: 1;
+  border: none;
+  background: none;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--muted);
+  font-family: var(--font);
+  transition: background 0.14s ease, color 0.14s ease;
+}
+
+.auth-tab.active {
+  background: #fff;
+  color: var(--navy);
+  box-shadow: 0 1px 3px rgba(11, 44, 77, 0.15);
+}
+
+.auth-error,
+.auth-notice {
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 9px 11px;
+  line-height: 1.45;
+}
+
+.auth-error {
+  color: var(--pro);
+  background: var(--pro-tint);
+}
+
+.auth-notice {
+  color: var(--plus);
+  background: var(--plus-tint);
+}
+
+.modal-submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.account-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 6px;
+}
+
+.account-email {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Plans / pricing ─────────────────────────────────────────────────────── */
+.plans-modal {
+  max-width: 760px;
+  width: min(760px, calc(100vw - 32px));
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+}
+
+.plan-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.plan-card {
+  border: 1.5px solid var(--border-light);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.plan-card.plus {
+  border-color: rgba(47, 169, 138, 0.45);
+}
+
+.plan-card.pro {
+  border-color: rgba(214, 69, 69, 0.4);
+}
+
+.plan-card.current {
+  background: #fbfdff;
+}
+
+.plan-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.plan-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--navy);
+}
+
+.plan-name.plus {
+  color: var(--plus);
+}
+
+.plan-name.pro {
+  color: var(--pro);
+}
+
+.plan-current {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--faint);
+}
+
+.plan-price {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--navy);
+  letter-spacing: -0.6px;
+  margin-top: 8px;
+}
+
+.plan-price small {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-left: 2px;
+  letter-spacing: 0;
+}
+
+.plan-blurb {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+  line-height: 1.45;
+}
+
+.plan-perks {
+  list-style: none;
+  margin: 12px 0 16px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.plan-perks li {
+  font-size: 13px;
+  color: var(--text);
+  padding-left: 18px;
+  position: relative;
+  line-height: 1.4;
+}
+
+.plan-perks li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--plus);
+  font-weight: 800;
+}
+
+.plan-cta {
+  border: none;
+  border-radius: 9px;
+  padding: 11px 12px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font);
+  color: #fff;
+  background: var(--navy);
+  transition: filter 0.14s ease;
+}
+
+.plan-cta.plus {
+  background: var(--plus);
+}
+
+.plan-cta.pro {
+  background: var(--pro);
+}
+
+.plan-cta:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.plan-cta:disabled {
+  background: var(--border-light);
+  color: var(--faint);
+  cursor: default;
+}
+
+@media (max-width: 720px) {
+  .plan-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── BoatGoat Events (event names in cursive black) ──────────────────────── */
+.logo-events,
+.events-script {
+  font-family: "Snell Roundhand", "Apple Chancery", "Segoe Script", "Brush Script MT", cursive;
+  color: #000;
+  font-weight: 600;
+  font-style: italic;
+}
+
+.logo-events {
+  margin-left: 8px;
+  font-size: 1.08em;
+}
+
+.events-view {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 28px 20px 48px;
+}
+
+.events-hero h1 {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  color: var(--navy);
+}
+
+.events-hero .events-script {
+  font-size: 1.15em;
+}
+
+.events-hero p {
+  margin-top: 8px;
+  font-size: 14.5px;
+  color: var(--muted);
+  line-height: 1.55;
+  max-width: 60ch;
+}
+
+.event-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.event-card {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  border: 1px solid var(--border-light);
+  border-radius: 14px;
+  padding: 16px;
+  background: #fff;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.16s ease, transform 0.16s ease;
+}
+
+.event-card:hover {
+  box-shadow: 0 8px 20px rgba(11, 44, 77, 0.14);
+  transform: translateY(-1px);
+}
+
+.event-date-block {
+  flex-shrink: 0;
+  width: 58px;
+  text-align: center;
+  border-radius: 10px;
+  background: var(--blue-tint);
+  padding: 8px 4px;
+}
+
+.event-date-block .event-month {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--blue);
+}
+
+.event-date-block .event-day {
+  display: block;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--navy);
+  line-height: 1.1;
+}
+
+.event-body {
+  min-width: 0;
+}
+
+/* The event name itself — cursive, black. */
+.event-name {
+  font-family: "Snell Roundhand", "Apple Chancery", "Segoe Script", "Brush Script MT", cursive;
+  color: #000;
+  font-style: italic;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.event-meta {
+  font-size: 13.5px;
+  color: var(--muted);
+  margin-top: 5px;
+  line-height: 1.5;
+}
+
+.event-harbor {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--blue);
+  background: var(--blue-tint);
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
+.events-foot {
+  margin-top: 22px;
+  font-size: 12.5px;
+  color: var(--faint);
+  line-height: 1.5;
+}
+
+/* ── Trips: hero, timeline, stats, AI briefing ───────────────────────────── */
+.trips-hero h1 {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  color: var(--navy);
+}
+
+.trips-hero p {
+  margin-top: 8px;
+  font-size: 14.5px;
+  color: var(--muted);
+  line-height: 1.55;
+  max-width: 62ch;
+}
+
+.trip-timeline {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0 0 0 4px;
+  border-left: 2px dashed var(--border);
+}
+
+.trip-stop {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 5px 0 5px 16px;
+}
+
+.trip-dot {
+  position: absolute;
+  left: -6px;
+  top: 11px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--blue);
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+.trip-stop-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.trip-stop-nights {
+  font-size: 12.5px;
+  color: var(--faint);
+}
+
+.trip-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.trip-stat {
+  background: var(--blue-tint);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.trip-stat-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+.trip-stat b {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--navy);
+}
+
+.trip-wind {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.trip-ai {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--blue-tint);
+}
+
+.trip-ai-text {
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.55;
+}
+
+@media (max-width: 640px) {
+  .trip-stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 /* ── Safety rating ────────────────────────────────────────────────────────── */
 .safety-card {
   border: 1px solid var(--border-light);

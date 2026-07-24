@@ -1078,6 +1078,8 @@ export interface MarinaEvent {
   day: string;
   title: string;
   detail: string;
+  /** Which harbor it happens in — powers the Events view grouping. */
+  harbor?: string;
 }
 
 export const events: MarinaEvent[] = [
@@ -1115,5 +1117,62 @@ export const events: MarinaEvent[] = [
     day: "12",
     title: "Holiday Boat Parade",
     detail: "Main channel · 5:55 PM · 60+ boats",
+    harbor: "Marina del Rey",
+  },
+  {
+    id: "avalon-harbor-fest",
+    month: "AUG",
+    day: "8",
+    title: "Avalon Harbor Festival",
+    detail: "Avalon Bay · live music from the mole · moorings book out early",
+    harbor: "Catalina",
+  },
+  {
+    id: "lb-congressional-cup",
+    month: "APR",
+    day: "15",
+    title: "Congressional Cup",
+    detail: "Belmont Veterans Pier · match racing you can watch from the beach",
+    harbor: "Long Beach",
+  },
+  {
+    id: "sd-wooden-boat",
+    month: "SEP",
+    day: "20",
+    title: "Festival of Sail",
+    detail: "Embarcadero · tall ships & cannon battles · guest slips fill fast",
+    harbor: "San Diego",
+  },
+  {
+    id: "nb-christmas-boat-parade",
+    month: "DEC",
+    day: "17",
+    title: "Newport Beach Christmas Boat Parade",
+    detail: "Newport Harbor · 6:30 PM · a century-old tradition",
+    harbor: "Newport Beach",
+  },
+  {
+    id: "sb-harbor-seafood",
+    month: "OCT",
+    day: "11",
+    title: "Santa Barbara Harbor & Seafood Festival",
+    detail: "Harbor Way · uni, urchin divers, and a working waterfront",
+    harbor: "Santa Barbara",
+  },
+  {
+    id: "dana-point-whales",
+    month: "MAR",
+    day: "7",
+    title: "Festival of Whales",
+    detail: "Dana Point Harbor · gray-whale migration · two weekends",
+    harbor: "Dana Point",
+  },
+  {
+    id: "ventura-tall-ships",
+    month: "JUL",
+    day: "31",
+    title: "Ventura Harbor Summer Concerts",
+    detail: "Harbor Village green · Saturdays · free with a slip",
+    harbor: "Ventura",
   },
 ];

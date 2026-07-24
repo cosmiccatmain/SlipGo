@@ -1,5 +1,5 @@
-import { useCallback, useMemo, useState } from "react";
-import { Header, type NavKey } from "./components/Header";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Header, type NavKey, type View } from "./components/Header";
 import { FilterBar, type Filters } from "./components/FilterBar";
 import { ListingsPanel, type SortMode } from "./components/ListingsPanel";
 import { MapView } from "./components/MapView";
@@ -7,6 +7,9 @@ import { SignInModal } from "./components/SignInModal";
 import { Toast } from "./components/Toast";
 import { ListingDetail } from "./components/ListingDetail";
 import { TripsView } from "./components/TripsView";
+import { EventsView } from "./components/EventsView";
+import { PlansModal } from "./components/PlansModal";
+import { useAuth } from "./lib/auth";
 import { allListings, rentListings, saleListings, type ListingType, type ListingMode } from "./data/listings";
 
 const ALL_TYPES: ListingType[] = ["marina", "guest-dock", "yacht-club"];
@@ -33,7 +36,17 @@ export default function App() {
   const [signInOpen, setSignInOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [detailId, setDetailId] = useState<string | null>(null);
-  const [view, setView] = useState<"search" | "trips">("search");
+  const [view, setView] = useState<View>("search");
+  const [plansOpen, setPlansOpen] = useState(false);
+  const { justSignedUp, clearJustSignedUp } = useAuth();
+
+  // Right after a successful sign-up, present the plans.
+  useEffect(() => {
+    if (justSignedUp) {
+      setPlansOpen(true);
+      clearJustSignedUp();
+    }
+  }, [justSignedUp, clearJustSignedUp]);
 
   // Which top-nav item is highlighted, derived from mode + type filter.
   const activeNav: NavKey = useMemo(() => {
@@ -102,14 +115,19 @@ export default function App() {
       <Header
         activeNav={activeNav}
         onNav={handleNav}
-        tripsActive={view === "trips"}
-        onTrips={() => setView("trips")}
+        view={view}
+        onView={setView}
+        onPricing={() => setPlansOpen(true)}
         onSignIn={() => setSignInOpen(true)}
         onToast={setToast}
       />
       {view === "trips" ? (
         <main className="trips-main">
           <TripsView />
+        </main>
+      ) : view === "events" ? (
+        <main className="trips-main">
+          <EventsView />
         </main>
       ) : (
         <>
@@ -161,6 +179,7 @@ export default function App() {
       )}
 
       <SignInModal open={signInOpen} onClose={() => setSignInOpen(false)} />
+      <PlansModal open={plansOpen} onClose={() => setPlansOpen(false)} onToast={setToast} />
       <Toast message={toast} onDone={() => setToast(null)} />
     </div>
   );

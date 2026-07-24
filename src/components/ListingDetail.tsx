@@ -4,7 +4,8 @@ import { marinaPhoto } from "../lib/photos";
 import { getEstimate, formatEstimate } from "../lib/estimate";
 import { useEnrichment } from "../lib/enrich";
 import { getSafety } from "../lib/safety";
-import { getTier, hasFeature } from "../lib/membership";
+import { hasFeature } from "../lib/membership";
+import { useTier } from "../lib/auth";
 
 interface Props {
   listing: Listing;
@@ -51,7 +52,7 @@ export function ListingDetail({ listing, onClose }: Props) {
   const summary = server?.summary ?? null;
   const websiteUrl = place?.website ?? listing.website ?? null;
   const safety = getSafety(listing);
-  const tier = getTier();
+  const tier = useTier();
   const canSafety = hasFeature(tier, "safety");
   const canNeighbors = hasFeature(tier, "slipNeighbors");
   // Official goaty rating blends the AI score with safety once crime data is
