@@ -6,6 +6,7 @@ import { useEnrichment } from "../lib/enrich";
 import { getSafety } from "../lib/safety";
 import { hasFeature } from "../lib/membership";
 import { useTier } from "../lib/auth";
+import { SlipList } from "./SlipList";
 
 interface Props {
   listing: Listing;
@@ -175,6 +176,9 @@ export function ListingDetail({ listing, onClose }: Props) {
           </div>
           <span className={"value-chip " + est.verdict}>{est.label}</span>
         </div>
+
+        {/* What you actually came for: the open slips, sizes and rates. */}
+        <SlipList listing={listing} />
 
         {/* AI overall take — grounded in real data, only when configured */}
         <section className="ai-take">
