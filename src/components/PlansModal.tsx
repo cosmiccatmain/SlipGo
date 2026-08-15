@@ -1,61 +1,12 @@
 import { useEffect } from "react";
 import { useAuth } from "../lib/auth";
-import type { Tier } from "../lib/membership";
+import { PLANS, planLabel, type Plan } from "../lib/plans";
 
 interface Props {
   open: boolean;
   onClose: () => void;
   onToast: (msg: string) => void;
 }
-
-interface Plan {
-  tier: Tier;
-  name: string;
-  price: string;
-  cadence: string;
-  blurb: string;
-  perks: string[];
-}
-
-// Placeholder pricing — real checkout arrives when Stripe is connected.
-const PLANS: Plan[] = [
-  {
-    tier: "free",
-    name: "Free",
-    price: "$0",
-    cadence: "forever",
-    blurb: "Search every slip in California.",
-    perks: ["All 99 listings & the map", "SlipGo Estimate", "Skipper AI summaries", "Live wind", "1 boat saved"],
-  },
-  {
-    tier: "plus",
-    name: "Plus",
-    price: "$14",
-    cadence: "/mo",
-    blurb: "The details that decide a slip.",
-    perks: [
-      "Crime & Safety ratings",
-      "Slip neighbors",
-      "Curated Trips + slip prices",
-      "Wind-timed routes",
-      "3 boats saved",
-    ],
-  },
-  {
-    tier: "pro",
-    name: "Pro",
-    price: "$39",
-    cadence: "/mo",
-    blurb: "For liveaboards and long cruises.",
-    perks: [
-      "Everything in Plus",
-      "Build custom multi-stop trips",
-      "Fuel & pump-out planning",
-      "Full Grand Tour routes",
-      "Unlimited boats",
-    ],
-  },
-];
 
 export function PlansModal({ open, onClose, onToast }: Props) {
   const { tier: currentTier, chooseTier } = useAuth();
@@ -75,7 +26,7 @@ export function PlansModal({ open, onClose, onToast }: Props) {
     onToast(
       plan.tier === "free"
         ? "You're on the Free plan."
-        : `${plan.name} unlocked. Billing goes live when Stripe is connected.`,
+        : `${planLabel(plan.tier)} unlocked. Billing goes live when checkout is connected.`,
     );
   };
 

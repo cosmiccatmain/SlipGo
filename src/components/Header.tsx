@@ -1,7 +1,7 @@
 import { useAuth } from "../lib/auth";
 
 export type NavKey = "rent" | "buy" | "guest" | "yacht";
-export type View = "search" | "trips" | "events";
+export type View = "search" | "trips" | "events" | "pricing";
 
 interface Props {
   activeNav: NavKey;
@@ -61,7 +61,10 @@ export function Header({ activeNav, onNav, view, onView, onPricing, onBoats, onS
       </button>
 
       <nav className="header-side header-right">
-        <button className="nav-link" onClick={onPricing}>
+        <button
+          className={"nav-link" + (view === "pricing" ? " active" : "")}
+          onClick={onPricing}
+        >
           Pricing
         </button>
         <button className="nav-link" onClick={() => onToast("Listing tools are coming soon.")}>

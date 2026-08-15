@@ -7,10 +7,12 @@ import { getSafety } from "../lib/safety";
 import { hasFeature } from "../lib/membership";
 import { useTier } from "../lib/auth";
 import { SlipList } from "./SlipList";
+import { LockedFeature } from "./LockedFeature";
 
 interface Props {
   listing: Listing;
   onClose: () => void;
+  onPricing: () => void;
 }
 
 const TYPE_LABEL: Record<Listing["type"], string> = {
@@ -45,7 +47,7 @@ function Stars({ rating }: { rating: number }) {
   );
 }
 
-export function ListingDetail({ listing, onClose }: Props) {
+export function ListingDetail({ listing, onClose, onPricing }: Props) {
   const est = getEstimate(listing);
   const { windLoading, wind, serverLoading, server } = useEnrichment(listing);
 
@@ -263,9 +265,15 @@ export function ListingDetail({ listing, onClose }: Props) {
               {canNeighbors ? (
                 <div className="cond-muted">Provided by the marina operator — not public data.</div>
               ) : (
-                <div className="tier-note">
-                  A SlipGo Plus feature — see who's docked around you.
-                </div>
+                <LockedFeature
+                  variant="inline"
+                  tier="plus"
+                  title="Know your neighbours"
+                  body="See who's docked around a slip before you commit to it."
+                  ctaLabel="Unlock with Plus"
+                  onUnlock={onPricing}
+                  onComparePlans={onPricing}
+                />
               )}
             </div>
           </div>
@@ -276,10 +284,15 @@ export function ListingDetail({ listing, onClose }: Props) {
             Safety rating <span className="tier-chip plus">Plus</span>
           </h3>
           {!canSafety ? (
-            <div className="tier-note">
-              Crime &amp; safety ratings are a SlipGo Plus feature. Source when
-              live: {safety.source}.
-            </div>
+            <LockedFeature
+              variant="inline"
+              tier="plus"
+              title="Know the area before you dock"
+              body={`How safe the area around this marina is, sourced from ${safety.source}.`}
+              ctaLabel="Unlock with Plus"
+              onUnlock={onPricing}
+              onComparePlans={onPricing}
+            />
           ) : (
           <div className="safety-card">
             <div className="safety-head">

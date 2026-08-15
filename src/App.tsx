@@ -9,6 +9,7 @@ import { ListingDetail } from "./components/ListingDetail";
 import { TripsView } from "./components/TripsView";
 import { EventsView } from "./components/EventsView";
 import { PlansModal } from "./components/PlansModal";
+import { PricingView } from "./components/PricingView";
 import { BoatsModal } from "./components/BoatsModal";
 import { useAuth } from "./lib/auth";
 import { allListings, rentListings, saleListings, type ListingType, type ListingMode } from "./data/listings";
@@ -129,18 +130,22 @@ export default function App() {
         onNav={handleNav}
         view={view}
         onView={setView}
-        onPricing={() => setPlansOpen(true)}
+        onPricing={() => setView("pricing")}
         onBoats={() => setBoatsOpen(true)}
         onSignIn={() => setSignInOpen(true)}
         onToast={setToast}
       />
       {view === "trips" ? (
         <main className="trips-main">
-          <TripsView />
+          <TripsView onToast={setToast} onPricing={() => setView("pricing")} />
         </main>
       ) : view === "events" ? (
         <main className="trips-main">
           <EventsView />
+        </main>
+      ) : view === "pricing" ? (
+        <main className="trips-main">
+          <PricingView onToast={setToast} />
         </main>
       ) : (
         <>
@@ -170,7 +175,11 @@ export default function App() {
               onOpen={openDetail}
             />
             {detailListing && (
-              <ListingDetail listing={detailListing} onClose={() => setDetailId(null)} />
+              <ListingDetail
+                listing={detailListing}
+                onClose={() => setDetailId(null)}
+                onPricing={() => setView("pricing")}
+              />
             )}
           </main>
 
