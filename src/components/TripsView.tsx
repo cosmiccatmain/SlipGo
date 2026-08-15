@@ -102,6 +102,7 @@ export function TripsView({ onToast, onPricing }: Props) {
           onUnlock={onPricing}
           onComparePlans={onPricing}
           preview={<TripsPreview />}
+          previewLabel="What your trips look like"
         />
       </div>
     );
@@ -420,10 +421,21 @@ function TripsPreview() {
 function PreviewCard({ t }: { t: Itinerary }) {
   const stats = tripStats(t);
   const { listing } = destinationFor(t.stops);
+  const [photo, setPhoto] = useState<string | null>(
+    listing ? getCachedPhoto(listing.id) : null,
+  );
+  useEffect(() => {
+    if (!listing) return;
+    prefetchEnrichment(listing);
+    setPhoto(getCachedPhoto(listing.id));
+    return onEnrichmentReady((id) => {
+      if (id === listing.id) setPhoto(getCachedPhoto(listing.id));
+    });
+  }, [listing]);
   return (
       <article className="trip-card2 upcoming">
         <div className="tc-media">
-          <img src={marinaPhoto(listing?.photoSeed ?? 0)} alt="" />
+          <img src={photo ?? marinaPhoto(listing?.photoSeed ?? 0)} alt="" />
           <span className="tc-status upcoming">Planned</span>
         </div>
         <div className="tc-body">

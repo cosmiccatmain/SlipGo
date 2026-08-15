@@ -3386,120 +3386,179 @@ img.detail-hero.loaded {
    Locked features · Trips · Pricing
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ── Reusable locked-feature card ────────────────────────────────────────── */
-/* A light fade over the real UI, never a blur-out or a full-screen popup. */
+/* ── Reusable locked-feature panel ───────────────────────────────────────── */
+/* Panel and preview stack — nothing overlaps, so no card is ever cropped. */
 .locked-wrap {
-  position: relative;
-  margin-top: 18px;
+  margin-top: 22px;
 }
 
-.locked-preview {
-  opacity: 0.42;
-  pointer-events: none;
-  user-select: none;
-  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 42%, rgba(0, 0, 0, 0.25) 100%);
-  mask-image: linear-gradient(180deg, #000 0%, #000 42%, rgba(0, 0, 0, 0.25) 100%);
+.locked-panel {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 30px;
+  align-items: center;
+  padding: 30px 32px;
+  border-radius: 18px;
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(47, 169, 138, 0.28) 0%, rgba(11, 44, 77, 0) 55%),
+    linear-gradient(135deg, #0b2c4d 0%, #123a63 100%);
+  box-shadow: 0 16px 40px rgba(11, 44, 77, 0.28);
 }
 
-.locked-card {
-  position: relative;
-  margin-top: -84px;
-  background: #fff;
-  border: 1px solid var(--border-light);
-  border-radius: 16px;
-  padding: 22px;
-  box-shadow: 0 12px 34px rgba(11, 44, 77, 0.16);
-  max-width: 520px;
-  margin-left: auto;
-  margin-right: auto;
+.locked-panel.pro {
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(214, 69, 69, 0.28) 0%, rgba(11, 44, 77, 0) 55%),
+    linear-gradient(135deg, #0b2c4d 0%, #123a63 100%);
 }
 
-.locked-card.plus {
-  border-top: 3px solid var(--plus);
-}
-
-.locked-card.pro {
-  border-top: 3px solid var(--pro);
-}
-
-.locked-badge {
+.lp-badge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   font-size: 10.5px;
   font-weight: 800;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  padding: 4px 10px;
+  padding: 5px 11px;
   border-radius: 999px;
-  background: var(--plus-tint);
-  color: var(--plus);
+  color: #7fe3c4;
+  background: rgba(47, 169, 138, 0.16);
+  border: 1px solid rgba(127, 227, 196, 0.32);
 }
 
-.locked-card.pro .locked-badge,
-.locked-inline.pro .locked-badge {
-  background: var(--pro-tint);
-  color: var(--pro);
+.locked-panel.pro .lp-badge {
+  color: #ff9d9d;
+  background: rgba(214, 69, 69, 0.16);
+  border-color: rgba(255, 157, 157, 0.32);
 }
 
-.locked-title {
-  margin-top: 12px;
-  font-size: 20px;
+.lp-title {
+  margin-top: 14px;
+  font-size: 26px;
   font-weight: 800;
-  letter-spacing: -0.3px;
-  color: var(--navy);
-  line-height: 1.25;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+  color: #fff;
 }
 
-.locked-body {
-  margin-top: 8px;
-  font-size: 14.5px;
-  line-height: 1.55;
-  color: var(--muted);
+.lp-body {
+  margin-top: 10px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.76);
+  max-width: 46ch;
 }
 
-.locked-actions {
+.lp-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px 16px;
-  margin-top: 18px;
+  gap: 12px 20px;
+  margin-top: 22px;
 }
 
-.locked-cta {
+.lp-cta {
   border: none;
-  border-radius: 10px;
-  padding: 12px 20px;
-  font-size: 14.5px;
+  border-radius: 11px;
+  padding: 13px 24px;
+  font-size: 15px;
   font-weight: 700;
   font-family: var(--font);
   color: #fff;
   background: var(--plus);
+  box-shadow: 0 6px 18px rgba(47, 169, 138, 0.35);
   transition: filter 0.14s ease, transform 0.1s ease;
 }
 
-.locked-cta.pro {
+.lp-cta.pro {
   background: var(--pro);
+  box-shadow: 0 6px 18px rgba(214, 69, 69, 0.35);
 }
 
-.locked-cta:hover {
-  filter: brightness(1.07);
+.lp-cta:hover {
+  filter: brightness(1.08);
 }
 
-.locked-cta:active {
+.lp-cta:active {
   transform: translateY(1px);
 }
 
-.locked-compare {
+.lp-compare {
   border: none;
   background: none;
   font-family: var(--font);
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 700;
-  color: var(--blue);
+  color: #fff;
   text-decoration: underline;
-  text-underline-offset: 3px;
+  text-underline-offset: 4px;
+  opacity: 0.82;
   padding: 4px;
+}
+
+.lp-compare:hover {
+  opacity: 1;
+}
+
+.lp-points {
+  list-style: none;
+  margin: 0;
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+}
+
+.lp-points li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.lp-tick {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(47, 169, 138, 0.22);
+  color: #7fe3c4;
+}
+
+.lp-tick.pro {
+  background: rgba(214, 69, 69, 0.22);
+  color: #ff9d9d;
+}
+
+/* Preview sits below, complete and uncropped, fading only at its tail. */
+.locked-preview-block {
+  margin-top: 26px;
+}
+
+.locked-preview-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 10px;
+}
+
+.locked-preview {
+  opacity: 0.6;
+  pointer-events: none;
+  user-select: none;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 62%, rgba(0, 0, 0, 0.08) 100%);
+  mask-image: linear-gradient(180deg, #000 0%, #000 62%, rgba(0, 0, 0, 0.08) 100%);
 }
 
 /* Compact variant for locks inside a sidebar section. */
@@ -4337,19 +4396,25 @@ img.detail-hero.loaded {
     grid-column: 1 / -1;
   }
 
-  .locked-card {
-    margin-top: -56px;
-    padding: 18px;
+  .locked-panel {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 22px 20px;
   }
 
-  .locked-title {
-    font-size: 18px;
+  .lp-title {
+    font-size: 21px;
   }
 
-  .locked-actions .locked-cta {
-    flex: 1;
-    justify-content: center;
-    text-align: center;
+  .lp-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    justify-items: stretch;
+  }
+
+  .lp-cta {
+    width: 100%;
   }
 
   .pricing-hero h1 {
@@ -4370,30 +4435,10 @@ img.detail-hero.loaded {
   }
 }
 
-.locked-points {
-  list-style: none;
-  margin: 14px 0 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
 
-.locked-points li {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  font-size: 13.5px;
-  color: var(--text);
-  line-height: 1.45;
-}
 
-.locked-points svg {
-  flex-shrink: 0;
-  margin-top: 2px;
-  color: var(--plus);
-}
 
-.locked-card.pro .locked-points svg {
-  color: var(--pro);
-}
+
+
+
+
