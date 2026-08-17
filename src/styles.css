@@ -3554,11 +3554,13 @@ img.detail-hero.loaded {
 }
 
 .locked-preview {
-  opacity: 0.6;
+  /* Readable for most of its height — the fade only takes the last stretch,
+     so you can actually see the Trips UI rather than a hint of it. */
+  opacity: 0.72;
   pointer-events: none;
   user-select: none;
-  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 62%, rgba(0, 0, 0, 0.08) 100%);
-  mask-image: linear-gradient(180deg, #000 0%, #000 62%, rgba(0, 0, 0, 0.08) 100%);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 82%, rgba(0, 0, 0, 0.06) 100%);
+  mask-image: linear-gradient(180deg, #000 0%, #000 82%, rgba(0, 0, 0, 0.06) 100%);
 }
 
 /* Compact variant for locks inside a sidebar section. */

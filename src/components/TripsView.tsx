@@ -410,7 +410,7 @@ function TripsPreview() {
         ))}
       </div>
       <div className="trip-list">
-        {CURATED_TRIPS.slice(0, 2).map((t) => (
+        {CURATED_TRIPS.map((t) => (
           <PreviewCard key={t.id} t={t} />
         ))}
       </div>
