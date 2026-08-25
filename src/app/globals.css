@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+@theme {
+  --color-hull-950: #050c14;
+  --color-hull-900: #0a1622;
+  --color-hull-800: #112232;
+  --color-hull-700: #1b3247;
+  --color-hull-600: #274863;
+  --color-foam-100: #e9f2f8;
+  --color-foam-300: #a9c2d3;
+  --color-foam-400: #7c98ac;
+  --color-aqua-300: #6fe3d5;
+  --color-aqua-400: #35cfbf;
+  --color-aqua-500: #16b0a2;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background:
+    radial-gradient(60rem 40rem at 80% -10%, #0f2b3d 0%, transparent 60%),
+    var(--color-hull-950);
+  color: var(--color-foam-100);
+  min-height: 100vh;
+}
+
+::selection {
+  background: var(--color-aqua-500);
+  color: var(--color-hull-950);
+}
