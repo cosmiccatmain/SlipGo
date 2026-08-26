@@ -83,6 +83,7 @@ button {
 .nav-link {
   display: flex;
   align-items: center;
+  gap: 4px;
   padding: 0 13px;
   font-size: 14.5px;
   font-weight: 600;
@@ -92,7 +93,7 @@ button {
   background: none;
   position: relative;
   white-space: nowrap;
-  transition: color 0.14s ease;
+  transition: color 0.14s ease, opacity 0.14s ease;
 }
 
 .nav-link:hover,
@@ -101,7 +102,7 @@ button {
 }
 
 .nav-link.active::after,
-.nav-link:hover::after {
+.nav-link:hover:not(.locked)::after {
   content: "";
   position: absolute;
   left: 11px;
@@ -110,6 +111,20 @@ button {
   height: 3px;
   background: var(--blue);
   border-radius: 2px 2px 0 0;
+}
+
+.nav-link.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: var(--muted);
+}
+
+.nav-link.locked:hover {
+  color: var(--muted);
+}
+
+.lock-icon {
+  font-size: 12px;
 }
 
 .nav-link.signin {
