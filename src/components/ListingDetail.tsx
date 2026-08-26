@@ -3,7 +3,7 @@ import { events, type Listing } from "../data/listings";
 import { marinaPhoto } from "../lib/photos";
 import { getEstimate, formatEstimate } from "../lib/estimate";
 import { useEnrichment } from "../lib/enrich";
-import { getSafety } from "../lib/safety";
+import { useSafety } from "../lib/safety";
 import { hasFeature } from "../lib/membership";
 import { useTier } from "../lib/auth";
 import { SlipList } from "./SlipList";
@@ -54,7 +54,7 @@ export function ListingDetail({ listing, onClose, onPricing }: Props) {
   const place = server?.place ?? null;
   const summary = server?.summary ?? null;
   const websiteUrl = place?.website ?? listing.website ?? null;
-  const safety = getSafety(listing);
+  const safety = useSafety(listing);
   const tier = useTier();
   const canSafety = hasFeature(tier, "safety");
   const canNeighbors = hasFeature(tier, "slipNeighbors");
@@ -319,11 +319,13 @@ export function ListingDetail({ listing, onClose, onPricing }: Props) {
                 style={{ width: safety.ready && safety.score !== null ? `${safety.score}%` : "0%" }}
               />
             </div>
-            {!safety.ready && (
+            {!safety.ready ? (
               <p className="safety-note">
                 Crime &amp; safety data is being wired in from {safety.source}. Once
                 live, this Safety score becomes part of the official Skipper rating.
               </p>
+            ) : (
+              <p className="safety-note">{safety.note}</p>
             )}
           </div>
           )}
