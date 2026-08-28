@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../lib/auth";
 import { addBoat, boatLimitLabel, deleteBoat, BOAT_LIMIT, type Boat } from "../lib/boats";
-import { boatImageUrl, boatPortrait, type BoatKind } from "../lib/boatArt";
+import { fetchBoatPhoto, boatPortrait, type BoatKind, type BoatPhoto } from "../lib/boatArt";
 
 interface Props {
   onToast: (msg: string) => void;
@@ -10,26 +10,49 @@ interface Props {
 }
 
 /**
- * A boat's picture. The AI render is attempted only when we have a make/model
- * to render; anything else (no model, no key, a failed generation) falls
- * straight through to the local SVG portrait, so a card is never empty and
- * never shows a broken image.
+ * A boat's picture: a real photograph of its make/model when one can be found,
+ * otherwise the drawn placeholder. The photo is credited to the page it came
+ * from — these are third-party images, not ours and not the owner's own boat.
  */
-function BoatPhoto({ boat }: { boat: Boat }) {
-  const fallback = boatPortrait(boat.id, boat.lengthFt, boat.kind);
-  const generated = boatImageUrl(boat.model, boat.lengthFt, boat.kind);
-  const [src, setSrc] = useState(generated ?? fallback);
-  const showingGenerated = src === generated;
+function BoatPhotoView({ boat }: { boat: Boat }) {
+  const placeholder = boatPortrait(boat.id, boat.lengthFt, boat.kind);
+  const [photo, setPhoto] = useState<BoatPhoto | null>(null);
+  const [broken, setBroken] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    setPhoto(null);
+    setBroken(false);
+    fetchBoatPhoto(boat.model, boat.kind).then((r) => {
+      if (alive) setPhoto(r.photo);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [boat.model, boat.kind]);
+
+  // A hotlinked image can 404 or block us at any time; fall back silently.
+  const showPhoto = photo && !broken;
 
   return (
     <div className="boat-photo">
-      <img src={src} alt="" loading="lazy" onError={() => setSrc(fallback)} />
-      {showingGenerated && (
-        // Say plainly that this is a rendering of the model, not a photo of
-        // their actual hull — the app never passes generated art off as real.
-        <span className="boat-photo-tag" title="Generated from the make and model you entered">
-          Illustration
-        </span>
+      <img
+        src={showPhoto ? photo.url : placeholder}
+        alt={showPhoto ? photo.title : ""}
+        loading="lazy"
+        referrerPolicy="no-referrer"
+        onError={() => setBroken(true)}
+      />
+      {showPhoto && (
+        <a
+          className="boat-photo-credit"
+          href={photo.sourcePage}
+          target="_blank"
+          rel="noopener noreferrer nofollow"
+          title={`Photo of a ${boat.model} from ${photo.sourceName}`}
+        >
+          {photo.sourceName}
+        </a>
       )}
     </div>
   );
@@ -38,7 +61,7 @@ function BoatPhoto({ boat }: { boat: Boat }) {
 function BoatCard({ boat, onRemove }: { boat: Boat; onRemove: (b: Boat) => void }) {
   return (
     <article className="boat-card">
-      <BoatPhoto boat={boat} />
+      <BoatPhotoView boat={boat} />
       <div className="boat-card-body">
         <div className="boat-card-head">
           <h3>{boat.name}</h3>
@@ -189,7 +212,7 @@ export function BoatsView({ onToast, onPricing, onSignIn }: Props) {
             </label>
           </div>
           <p className="field-hint">
-            Add a make and model and we'll render a picture of that model for your card.
+            Add a make and model and we'll find a photo of that model for your card.
           </p>
 
           <div className="kind-toggle" role="group" aria-label="Boat type">

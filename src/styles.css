@@ -4804,19 +4804,29 @@ img.detail-hero.loaded {
   display: block;
 }
 
-.boat-photo-tag {
+/* Credit sits on the image itself and links back to where the photo lives. */
+.boat-photo-credit {
   position: absolute;
-  bottom: 8px;
-  right: 8px;
+  bottom: 7px;
+  right: 7px;
+  max-width: calc(100% - 14px);
   padding: 3px 8px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(4px);
   font-size: 10.5px;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
   color: var(--muted);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.14s ease, background 0.14s ease;
+}
+
+.boat-photo-credit:hover {
+  background: #fff;
+  color: var(--blue);
 }
 
 .boat-card-body {

@@ -1,10 +1,12 @@
-// Clean SVG boat portraits (data URIs) in the same house style as the marina
-// illustrations. Used as the instant, zero-cost artwork for every boat, and as
-// the fallback whenever the AI render is unavailable.
+// Boat imagery.
 //
-// The silhouette is driven by the boat's own numbers — a 30 ft sloop and a
-// 60 ft motoryacht come out visibly different — so the picture always says
-// something true about the boat even before any AI is involved.
+// A boat card shows a real photograph of its make/model, found through
+// /api/boat-photo. The SVG below is only the placeholder shown while that
+// loads, or when there is no model to search / no photo to be found — it is
+// never presented as a picture of the boat.
+//
+// The silhouette is driven by the boat's own numbers, so even the placeholder
+// says something true: a 30 ft sloop and a 60 ft motoryacht differ on sight.
 
 export type BoatKind = "sail" | "power";
 
@@ -98,16 +100,54 @@ export function boatPortrait(key: string, lengthFt: number, kind: BoatKind): str
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 
+export interface BoatPhoto {
+  url: string;
+  sourcePage: string;
+  sourceName: string;
+  title: string;
+}
+
+interface PhotoResult {
+  configured: boolean;
+  photo: BoatPhoto | null;
+  error?: string;
+}
+
+// One lookup per model per session, shared across cards, with in-flight
+// requests de-duplicated — the same model on two boats must not cost two
+// billed search queries.
+const photoCache = new Map<string, PhotoResult>();
+const inFlight = new Map<string, Promise<PhotoResult>>();
+
+const NONE: PhotoResult = { configured: false, photo: null };
+
 /**
- * URL of the AI-rendered portrait for a boat with a known make/model. Returns
- * null when there's no model to render — the caller then uses boatPortrait().
- *
- * The endpoint streams a PNG, so this can go straight into an <img src>: the
- * browser and the CDN handle caching, and nothing extra ships to the client.
+ * Real photograph of this make/model, or a null photo when there's nothing to
+ * search for, the search isn't configured, or nothing was found.
  */
-export function boatImageUrl(model: string | null, lengthFt: number, kind: BoatKind): string | null {
+export function fetchBoatPhoto(model: string | null, kind: BoatKind): Promise<PhotoResult> {
   const m = (model ?? "").trim();
-  if (!m) return null;
-  const params = new URLSearchParams({ model: m, length: String(lengthFt), kind });
-  return `/api/boat-image?${params.toString()}`;
+  if (!m) return Promise.resolve(NONE);
+
+  const cacheKey = `${kind}:${m.toLowerCase()}`;
+  const hit = photoCache.get(cacheKey);
+  if (hit) return Promise.resolve(hit);
+  const pending = inFlight.get(cacheKey);
+  if (pending) return pending;
+
+  const params = new URLSearchParams({ model: m, kind });
+  const req = fetch(`/api/boat-photo?${params.toString()}`)
+    .then(async (res): Promise<PhotoResult> => {
+      if (!res.ok) return NONE;
+      return (await res.json()) as PhotoResult;
+    })
+    .catch((): PhotoResult => NONE)
+    .then((result) => {
+      photoCache.set(cacheKey, result);
+      inFlight.delete(cacheKey);
+      return result;
+    });
+
+  inFlight.set(cacheKey, req);
+  return req;
 }
