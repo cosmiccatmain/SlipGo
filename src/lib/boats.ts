@@ -1,5 +1,6 @@
 import { supabase } from "./supabase";
 import type { Tier } from "./membership";
+import type { BoatKind } from "./boatArt";
 
 // ── Your fleet ───────────────────────────────────────────────────────────────
 // A boat drives Trips: its LOA sets slip cost and its cruise speed sets timing.
@@ -8,7 +9,11 @@ import type { Tier } from "./membership";
 
 export interface Boat {
   id: string;
+  /** What the owner calls her, e.g. "Second Wind". */
   name: string;
+  /** Make and model, e.g. "Catalina 42" — drives the generated artwork. */
+  model: string | null;
+  kind: BoatKind;
   lengthFt: number;
   beamFt: number | null;
   draftFt: number | null;
@@ -26,6 +31,8 @@ export function boatLimitLabel(tier: Tier): string {
 interface BoatRow {
   id: string;
   name: string;
+  model: string | null;
+  kind: string | null;
   length_ft: number | string;
   beam_ft: number | string | null;
   draft_ft: number | string | null;
@@ -36,6 +43,8 @@ function fromRow(r: BoatRow): Boat {
   return {
     id: r.id,
     name: r.name,
+    model: r.model ?? null,
+    kind: r.kind === "power" ? "power" : "sail",
     lengthFt: Number(r.length_ft),
     beamFt: r.beam_ft === null ? null : Number(r.beam_ft),
     draftFt: r.draft_ft === null ? null : Number(r.draft_ft),
@@ -46,7 +55,7 @@ function fromRow(r: BoatRow): Boat {
 export async function listBoats(userId: string): Promise<Boat[]> {
   const { data, error } = await supabase
     .from("boats")
-    .select("id, name, length_ft, beam_ft, draft_ft, cruise_kts")
+    .select("id, name, model, kind, length_ft, beam_ft, draft_ft, cruise_kts")
     .eq("user_id", userId)
     .order("created_at", { ascending: true });
   if (error || !data) return [];
@@ -62,12 +71,14 @@ export async function addBoat(
     .insert({
       user_id: userId,
       name: b.name,
+      model: b.model,
+      kind: b.kind,
       length_ft: b.lengthFt,
       beam_ft: b.beamFt,
       draft_ft: b.draftFt,
       cruise_kts: b.cruiseKts,
     })
-    .select("id, name, length_ft, beam_ft, draft_ft, cruise_kts")
+    .select("id, name, model, kind, length_ft, beam_ft, draft_ft, cruise_kts")
     .single();
   if (error || !data) return { error: error?.message ?? "Could not save that boat." };
   return { boat: fromRow(data as BoatRow) };

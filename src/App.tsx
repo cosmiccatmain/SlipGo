@@ -10,7 +10,8 @@ import { TripsView } from "./components/TripsView";
 import { EventsView } from "./components/EventsView";
 import { PlansModal } from "./components/PlansModal";
 import { PricingView } from "./components/PricingView";
-import { BoatsModal } from "./components/BoatsModal";
+import { BoatsView } from "./components/BoatsView";
+import { SettingsView, BillingView } from "./components/AccountViews";
 import { useAuth } from "./lib/auth";
 import { allListings, rentListings, saleListings, type ListingType, type ListingMode } from "./data/listings";
 
@@ -40,7 +41,6 @@ export default function App() {
   const [detailId, setDetailId] = useState<string | null>(null);
   const [view, setView] = useState<View>("search");
   const [plansOpen, setPlansOpen] = useState(false);
-  const [boatsOpen, setBoatsOpen] = useState(false);
   const [askBoatsNext, setAskBoatsNext] = useState(false);
   const { justSignedUp, clearJustSignedUp } = useAuth();
 
@@ -57,7 +57,7 @@ export default function App() {
     setPlansOpen(false);
     if (askBoatsNext) {
       setAskBoatsNext(false);
-      setBoatsOpen(true);
+      setView("boats");
     }
   }, [askBoatsNext]);
 
@@ -131,7 +131,6 @@ export default function App() {
         view={view}
         onView={setView}
         onPricing={() => setView("pricing")}
-        onBoats={() => setBoatsOpen(true)}
         onSignIn={() => setSignInOpen(true)}
         onToast={setToast}
       />
@@ -146,6 +145,32 @@ export default function App() {
       ) : view === "pricing" ? (
         <main className="trips-main">
           <PricingView onToast={setToast} />
+        </main>
+      ) : view === "boats" ? (
+        <main className="trips-main">
+          <BoatsView
+            onToast={setToast}
+            onPricing={() => setView("pricing")}
+            onSignIn={() => setSignInOpen(true)}
+          />
+        </main>
+      ) : view === "settings" ? (
+        <main className="trips-main">
+          <SettingsView
+            onToast={setToast}
+            onPricing={() => setView("pricing")}
+            onBoats={() => setView("boats")}
+            onSignIn={() => setSignInOpen(true)}
+          />
+        </main>
+      ) : view === "billing" ? (
+        <main className="trips-main">
+          <BillingView
+            onToast={setToast}
+            onPricing={() => setView("pricing")}
+            onBoats={() => setView("boats")}
+            onSignIn={() => setSignInOpen(true)}
+          />
         </main>
       ) : (
         <>
@@ -202,7 +227,6 @@ export default function App() {
 
       <SignInModal open={signInOpen} onClose={() => setSignInOpen(false)} />
       <PlansModal open={plansOpen} onClose={closePlans} onToast={setToast} />
-      <BoatsModal open={boatsOpen} onClose={() => setBoatsOpen(false)} onToast={setToast} />
       <Toast message={toast} onDone={() => setToast(null)} />
     </div>
   );

@@ -1,7 +1,8 @@
 import { useAuth } from "../lib/auth";
+import { AccountMenu } from "./AccountMenu";
 
 export type NavKey = "rent" | "buy" | "guest" | "yacht";
-export type View = "search" | "trips" | "events" | "pricing";
+export type View = "search" | "trips" | "events" | "pricing" | "boats" | "settings" | "billing";
 
 interface Props {
   activeNav: NavKey;
@@ -9,7 +10,6 @@ interface Props {
   view: View;
   onView: (v: View) => void;
   onPricing: () => void;
-  onBoats: () => void;
   onSignIn: () => void;
   onToast: (msg: string) => void;
 }
@@ -21,14 +21,32 @@ const NAV_ITEMS: { key: NavKey; label: string }[] = [
   { key: "yacht", label: "Yacht clubs" },
 ];
 
-export function Header({ activeNav, onNav, view, onView, onPricing, onBoats, onSignIn, onToast }: Props) {
-  const { user, tier, signOut } = useAuth();
+/** Small keyhole glyph — replaces the emoji padlock the nav used to show. */
+function LockGlyph() {
+  return (
+    <svg className="nav-lock" viewBox="0 0 24 24" width="11" height="11" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M17 9V7A5 5 0 0 0 7 7v2a3 3 0 0 0-3 3v6a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-6a3 3 0 0 0-3-3ZM9 7a3 3 0 0 1 6 0v2H9Zm4 9.7V18a1 1 0 0 1-2 0v-1.3a2 2 0 1 1 2 0Z"
+      />
+    </svg>
+  );
+}
+
+export function Header({
+  activeNav, onNav, view, onView, onPricing, onSignIn, onToast,
+}: Props) {
+  const { user } = useAuth();
   const inSearch = view === "search";
   const isLocked = !user;
 
-  const handleLockedClick = () => {
-    onSignIn();
-  };
+  // A locked item is a doorway, not a dead end: keep it enabled so it's
+  // focusable and clickable, and send the click to sign-in. `disabled` made
+  // these unreachable by keyboard and killed the tooltip.
+  const navClass = (active: boolean) =>
+    "nav-link" + (active ? " active" : "") + (isLocked ? " locked" : "");
+
+  const handle = (fn: () => void) => () => (isLocked ? onSignIn() : fn());
 
   return (
     <header className="header">
@@ -36,36 +54,33 @@ export function Header({ activeNav, onNav, view, onView, onPricing, onBoats, onS
         {NAV_ITEMS.map((item) => (
           <button
             key={item.key}
-            className={"nav-link" + (inSearch && activeNav === item.key ? " active" : "") + (isLocked ? " locked" : "")}
-            onClick={() => isLocked ? handleLockedClick() : onNav(item.key)}
-            title={isLocked ? "Sign up to unlock" : ""}
-            disabled={isLocked}
+            className={navClass(inSearch && activeNav === item.key)}
+            onClick={handle(() => onNav(item.key))}
+            title={isLocked ? "Free — sign up to open" : undefined}
           >
             {item.label}
-            {isLocked && <span className="lock-icon" aria-hidden="true">🔒</span>}
+            {isLocked && <LockGlyph />}
           </button>
         ))}
         <button
-          className={"nav-link" + (view === "trips" ? " active" : "") + (isLocked ? " locked" : "")}
-          onClick={() => isLocked ? handleLockedClick() : onView("trips")}
-          title={isLocked ? "Sign up to unlock" : ""}
-          disabled={isLocked}
+          className={navClass(view === "trips")}
+          onClick={handle(() => onView("trips"))}
+          title={isLocked ? "Free — sign up to open" : undefined}
         >
           Trips
-          {isLocked && <span className="lock-icon" aria-hidden="true">🔒</span>}
+          {isLocked && <LockGlyph />}
         </button>
         <button
-          className={"nav-link" + (view === "events" ? " active" : "") + (isLocked ? " locked" : "")}
-          onClick={() => isLocked ? handleLockedClick() : onView("events")}
-          title={isLocked ? "Sign up to unlock" : ""}
-          disabled={isLocked}
+          className={navClass(view === "events")}
+          onClick={handle(() => onView("events"))}
+          title={isLocked ? "Free — sign up to open" : undefined}
         >
           Events
-          {isLocked && <span className="lock-icon" aria-hidden="true">🔒</span>}
+          {isLocked && <LockGlyph />}
         </button>
       </nav>
 
-      <button className="logo" onClick={() => !isLocked && onNav("rent")} aria-label="SlipGo home">
+      <button className="logo" onClick={handle(() => onNav("rent"))} aria-label="SlipGo home">
         <img src="/logo-mark.png" alt="" className="logo-mark" />
         <span className="logo-word">
           <span className="logo-slip">Slip</span><span className="logo-go">Go</span>
@@ -81,34 +96,19 @@ export function Header({ activeNav, onNav, view, onView, onPricing, onBoats, onS
         >
           Pricing
         </button>
-        <button
-          className="nav-link"
-          onClick={() => onToast("Help center is coming soon.")}
-        >
+        <button className="nav-link" onClick={() => onToast("Help center is coming soon.")}>
           Help
         </button>
         {user ? (
-          <div className="account-wrap">
-            <button className="nav-link" onClick={onBoats}>
-              My boats
-            </button>
-            <span className="account-email" title={user.email ?? ""}>
-              {user.email}
-            </span>
-            {tier !== "free" && <span className={"tier-chip " + tier}>{tier}</span>}
-            <button
-              className="nav-link signin"
-              onClick={async () => {
-                await signOut();
-                onToast("Signed out.");
-              }}
-            >
-              Sign out
-            </button>
-          </div>
+          <AccountMenu
+            onBoats={() => onView("boats")}
+            onSettings={() => onView("settings")}
+            onBilling={() => onView("billing")}
+            onToast={onToast}
+          />
         ) : (
-          <button className="nav-link signin" onClick={onSignIn}>
-            Sign in
+          <button className="btn-signup" onClick={onSignIn}>
+            Sign up
           </button>
         )}
       </nav>
