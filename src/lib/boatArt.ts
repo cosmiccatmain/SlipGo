@@ -1,9 +1,8 @@
-// Boat imagery.
+// The drawn placeholder for a boat with no photo yet.
 //
-// A boat card shows a real photograph of its make/model, found through
-// /api/boat-photo. The SVG below is only the placeholder shown while that
-// loads, or when there is no model to search / no photo to be found — it is
-// never presented as a picture of the boat.
+// A boat card shows one image and one only: a photo its owner uploaded. Until
+// they do, this stands in — an obvious illustration, never dressed up as a
+// photograph, and never a picture of someone else's boat.
 //
 // The silhouette is driven by the boat's own numbers, so even the placeholder
 // says something true: a 30 ft sloop and a 60 ft motoryacht differ on sight.
@@ -98,56 +97,4 @@ export function boatPortrait(key: string, lengthFt: number, kind: BoatKind): str
 </svg>`;
 
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
-}
-
-export interface BoatPhoto {
-  url: string;
-  sourcePage: string;
-  sourceName: string;
-  title: string;
-}
-
-interface PhotoResult {
-  configured: boolean;
-  photo: BoatPhoto | null;
-  error?: string;
-}
-
-// One lookup per model per session, shared across cards, with in-flight
-// requests de-duplicated — the same model on two boats must not cost two
-// billed search queries.
-const photoCache = new Map<string, PhotoResult>();
-const inFlight = new Map<string, Promise<PhotoResult>>();
-
-const NONE: PhotoResult = { configured: false, photo: null };
-
-/**
- * Real photograph of this make/model, or a null photo when there's nothing to
- * search for, the search isn't configured, or nothing was found.
- */
-export function fetchBoatPhoto(model: string | null, kind: BoatKind): Promise<PhotoResult> {
-  const m = (model ?? "").trim();
-  if (!m) return Promise.resolve(NONE);
-
-  const cacheKey = `${kind}:${m.toLowerCase()}`;
-  const hit = photoCache.get(cacheKey);
-  if (hit) return Promise.resolve(hit);
-  const pending = inFlight.get(cacheKey);
-  if (pending) return pending;
-
-  const params = new URLSearchParams({ model: m, kind });
-  const req = fetch(`/api/boat-photo?${params.toString()}`)
-    .then(async (res): Promise<PhotoResult> => {
-      if (!res.ok) return NONE;
-      return (await res.json()) as PhotoResult;
-    })
-    .catch((): PhotoResult => NONE)
-    .then((result) => {
-      photoCache.set(cacheKey, result);
-      inFlight.delete(cacheKey);
-      return result;
-    });
-
-  inFlight.set(cacheKey, req);
-  return req;
 }

@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "../lib/auth";
 import { addBoat, boatLimitLabel, deleteBoat, BOAT_LIMIT, type Boat } from "../lib/boats";
-import { fetchBoatPhoto, boatPortrait, type BoatKind, type BoatPhoto } from "../lib/boatArt";
+import { boatPortrait, type BoatKind } from "../lib/boatArt";
+import { PHOTO_ACCEPT, bust, photoUrl, removeBoatPhoto, uploadBoatPhoto } from "../lib/boatPhotos";
 
 interface Props {
   onToast: (msg: string) => void;
@@ -9,59 +10,115 @@ interface Props {
   onSignIn: () => void;
 }
 
+function CameraIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M9.4 4h5.2l1.2 2H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4.2l1.2-2Zm2.6 5a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9Zm0 2a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5Z"
+      />
+    </svg>
+  );
+}
+
 /**
- * A boat's picture: a real photograph of its make/model when one can be found,
- * otherwise the drawn placeholder. The photo is credited to the page it came
- * from — these are third-party images, not ours and not the owner's own boat.
+ * A boat's picture. Only ever the owner's own upload — nothing is searched for
+ * or generated. Until they upload, the drawn placeholder stands in and the
+ * whole tile is the button that starts an upload.
  */
-function BoatPhotoView({ boat }: { boat: Boat }) {
+function BoatPhotoView({
+  boat,
+  userId,
+  onChanged,
+  onToast,
+}: {
+  boat: Boat;
+  userId: string;
+  onChanged: () => Promise<void>;
+  onToast: (msg: string) => void;
+}) {
   const placeholder = boatPortrait(boat.id, boat.lengthFt, boat.kind);
-  const [photo, setPhoto] = useState<BoatPhoto | null>(null);
-  const [broken, setBroken] = useState(false);
+  const [busy, setBusy] = useState(false);
+  // Storage reuses the URL on re-upload, so bump this to defeat the cache.
+  const [version, setVersion] = useState(0);
+  const inputId = `boat-photo-${boat.id}`;
 
-  useEffect(() => {
-    let alive = true;
-    setPhoto(null);
-    setBroken(false);
-    fetchBoatPhoto(boat.model, boat.kind).then((r) => {
-      if (alive) setPhoto(r.photo);
-    });
-    return () => {
-      alive = false;
-    };
-  }, [boat.model, boat.kind]);
+  const stored = photoUrl(boat.photoPath);
+  const src = stored ? bust(stored, version) : placeholder;
 
-  // A hotlinked image can 404 or block us at any time; fall back silently.
-  const showPhoto = photo && !broken;
+  const pick = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // let the same file be chosen again after a failure
+    if (!file || busy) return;
+    setBusy(true);
+    const res = await uploadBoatPhoto(userId, boat.id, file);
+    setBusy(false);
+    if (res.error) {
+      onToast(res.error);
+      return;
+    }
+    setVersion((v) => v + 1);
+    await onChanged();
+    onToast(`Photo added to ${boat.name}.`);
+  };
+
+  const clear = async () => {
+    if (!boat.photoPath || busy) return;
+    setBusy(true);
+    const res = await removeBoatPhoto(boat.id, boat.photoPath);
+    setBusy(false);
+    if (res.error) {
+      onToast(res.error);
+      return;
+    }
+    await onChanged();
+    onToast("Photo removed.");
+  };
 
   return (
-    <div className="boat-photo">
-      <img
-        src={showPhoto ? photo.url : placeholder}
-        alt={showPhoto ? photo.title : ""}
-        loading="lazy"
-        referrerPolicy="no-referrer"
-        onError={() => setBroken(true)}
+    <div className={"boat-photo" + (stored ? " has-photo" : "")}>
+      <img src={src} alt={stored ? `${boat.name}` : ""} loading="lazy" />
+
+      <input
+        id={inputId}
+        type="file"
+        accept={PHOTO_ACCEPT}
+        className="visually-hidden"
+        onChange={pick}
+        disabled={busy}
       />
-      {showPhoto && (
-        <a
-          className="boat-photo-credit"
-          href={photo.sourcePage}
-          target="_blank"
-          rel="noopener noreferrer nofollow"
-          title={`Photo of a ${boat.model} from ${photo.sourceName}`}
-        >
-          {photo.sourceName}
-        </a>
+
+      {busy ? (
+        <span className="boat-photo-busy">Uploading…</span>
+      ) : stored ? (
+        <div className="boat-photo-actions">
+          <label htmlFor={inputId} className="photo-action">Replace</label>
+          <button type="button" className="photo-action" onClick={clear}>Remove</button>
+        </div>
+      ) : (
+        <label htmlFor={inputId} className="boat-photo-add">
+          <span className="photo-add-pill">
+            <CameraIcon />
+            Add a photo
+          </span>
+        </label>
       )}
     </div>
   );
 }
 
-function BoatCard({ boat, onRemove }: { boat: Boat; onRemove: (b: Boat) => void }) {
+function BoatCard({
+  boat, userId, onRemove, onChanged, onToast,
+}: {
+  boat: Boat;
+  userId: string;
+  onRemove: (b: Boat) => void;
+  onChanged: () => Promise<void>;
+  onToast: (msg: string) => void;
+}) {
   return (
     <article className="boat-card">
-      <BoatPhotoView boat={boat} />
+      <BoatPhotoView boat={boat} userId={userId} onChanged={onChanged} onToast={onToast} />
       <div className="boat-card-body">
         <div className="boat-card-head">
           <h3>{boat.name}</h3>
@@ -180,7 +237,16 @@ export function BoatsView({ onToast, onPricing, onSignIn }: Props) {
 
       {boats.length > 0 && (
         <div className="boat-grid">
-          {boats.map((b) => <BoatCard key={b.id} boat={b} onRemove={remove} />)}
+          {boats.map((b) => (
+            <BoatCard
+              key={b.id}
+              boat={b}
+              userId={user.id}
+              onRemove={remove}
+              onChanged={refreshBoats}
+              onToast={onToast}
+            />
+          ))}
         </div>
       )}
 
@@ -212,7 +278,7 @@ export function BoatsView({ onToast, onPricing, onSignIn }: Props) {
             </label>
           </div>
           <p className="field-hint">
-            Add a make and model and we'll find a photo of that model for your card.
+            The make and model is shown on the card. Add a photo of your boat once it's saved.
           </p>
 
           <div className="kind-toggle" role="group" aria-label="Boat type">

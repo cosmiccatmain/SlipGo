@@ -14,6 +14,8 @@ export interface Boat {
   /** Make and model, e.g. "Catalina 42" — drives the generated artwork. */
   model: string | null;
   kind: BoatKind;
+  /** Storage path of the owner's uploaded photo, if any. */
+  photoPath: string | null;
   lengthFt: number;
   beamFt: number | null;
   draftFt: number | null;
@@ -33,6 +35,7 @@ interface BoatRow {
   name: string;
   model: string | null;
   kind: string | null;
+  photo_path: string | null;
   length_ft: number | string;
   beam_ft: number | string | null;
   draft_ft: number | string | null;
@@ -45,6 +48,7 @@ function fromRow(r: BoatRow): Boat {
     name: r.name,
     model: r.model ?? null,
     kind: r.kind === "power" ? "power" : "sail",
+    photoPath: r.photo_path ?? null,
     lengthFt: Number(r.length_ft),
     beamFt: r.beam_ft === null ? null : Number(r.beam_ft),
     draftFt: r.draft_ft === null ? null : Number(r.draft_ft),
@@ -55,7 +59,7 @@ function fromRow(r: BoatRow): Boat {
 export async function listBoats(userId: string): Promise<Boat[]> {
   const { data, error } = await supabase
     .from("boats")
-    .select("id, name, model, kind, length_ft, beam_ft, draft_ft, cruise_kts")
+    .select("id, name, model, kind, photo_path, length_ft, beam_ft, draft_ft, cruise_kts")
     .eq("user_id", userId)
     .order("created_at", { ascending: true });
   if (error || !data) return [];
@@ -64,7 +68,7 @@ export async function listBoats(userId: string): Promise<Boat[]> {
 
 export async function addBoat(
   userId: string,
-  b: Omit<Boat, "id">,
+  b: Omit<Boat, "id" | "photoPath">,
 ): Promise<{ boat?: Boat; error?: string }> {
   const { data, error } = await supabase
     .from("boats")
@@ -78,7 +82,7 @@ export async function addBoat(
       draft_ft: b.draftFt,
       cruise_kts: b.cruiseKts,
     })
-    .select("id, name, model, kind, length_ft, beam_ft, draft_ft, cruise_kts")
+    .select("id, name, model, kind, photo_path, length_ft, beam_ft, draft_ft, cruise_kts")
     .single();
   if (error || !data) return { error: error?.message ?? "Could not save that boat." };
   return { boat: fromRow(data as BoatRow) };

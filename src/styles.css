@@ -4804,29 +4804,105 @@ img.detail-hero.loaded {
   display: block;
 }
 
-/* Credit sits on the image itself and links back to where the photo lives. */
-.boat-photo-credit {
+.visually-hidden {
   position: absolute;
-  bottom: 7px;
-  right: 7px;
-  max-width: calc(100% - 14px);
-  padding: 3px 8px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(4px);
-  font-size: 10.5px;
-  font-weight: 700;
-  color: var(--muted);
-  text-decoration: none;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
   overflow: hidden;
-  text-overflow: ellipsis;
+  clip-path: inset(50%);
   white-space: nowrap;
-  transition: color 0.14s ease, background 0.14s ease;
 }
 
-.boat-photo-credit:hover {
+/* With no photo the whole tile is the target — the placeholder is a prompt,
+   not decoration. Once there is a photo the controls step back to a hover
+   affordance so the boat is what you look at. */
+.boat-photo-add {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  transition: opacity 0.16s ease;
+}
+
+/* Label sits in its own pill: plain text over the placeholder's mast and
+   sails is unreadable however the wash is tuned. */
+.photo-add-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 16px;
+  border-radius: 999px;
   background: #fff;
+  box-shadow: var(--shadow-card);
+  font-size: 13.5px;
+  font-weight: 700;
   color: var(--blue);
+}
+
+.boat-photo:hover .boat-photo-add,
+.boat-photo-add:focus-within,
+input:focus-visible + .boat-photo-add {
+  opacity: 1;
+}
+
+/* Touch has no hover, so keep the prompt permanently visible there. */
+@media (hover: none) {
+  .boat-photo-add { opacity: 1; }
+}
+
+.boat-photo-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.16s ease;
+}
+
+.boat-photo:hover .boat-photo-actions,
+.boat-photo-actions:focus-within {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .boat-photo-actions { opacity: 1; }
+}
+
+.photo-action {
+  padding: 4px 10px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(4px);
+  box-shadow: var(--shadow-card);
+  font-size: 11.5px;
+  font-weight: 700;
+  font-family: var(--font);
+  color: var(--text);
+  cursor: pointer;
+  transition: color 0.14s ease;
+}
+
+.photo-action:hover { color: var(--blue); }
+.boat-photo-actions .photo-action:last-child:hover { color: var(--pro); }
+
+.boat-photo-busy {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
 }
 
 .boat-card-body {

@@ -22,8 +22,6 @@ a save. Restrict this key by HTTP referrer and allow only the Map Tiles API.
 | Variable | Purpose | Without it |
 | --- | --- | --- |
 | `GOOGLE_MAPS_API_KEY` | Google Places: real ratings, reviews, photos | Listings show no reviews |
-| `GOOGLE_SEARCH_CX` | Programmable Search Engine id for boat photos | Boat cards show the drawn placeholder |
-| `GOOGLE_SEARCH_API_KEY` | Key for the Custom Search API | Falls back to `GOOGLE_MAPS_API_KEY` |
 | `OPENAI_API_KEY` | Grounded listing summaries | Listings show no AI summary |
 | `OPENAI_MODEL` | Override the summary model | Defaults to `gpt-4o-mini` |
 
@@ -33,29 +31,23 @@ no `Referer` header, so a website-restricted key returns
 
 ## Boat photos
 
-Boat cards show a real photograph of the make/model the owner entered, found
-through the Google Custom Search JSON API in image mode (`api/boat-photo.ts`)
-and credited back to the page it came from.
+A boat card shows one image and one only: a photo its owner uploaded. Nothing
+is searched for, generated, or borrowed — the pattern MarineTraffic and
+FlightAware use, where the person who owns the photo supplies it.
 
-To enable it:
+Uploads go to the public `boat-photos` Supabase Storage bucket at
+`<user_id>/<boat_id>.jpg`. Storage RLS keys on that first path segment, so a
+user can only write inside their own folder; reads are public. The bucket caps
+uploads at 5 MB and to JPEG/PNG/WebP — server-side, because the client checks
+are bypassable.
 
-1. Create a search engine at <https://programmablesearchengine.google.com/> —
-   turn **Image search** on and **Search the entire web** on.
-2. Copy its **Search engine ID** into `GOOGLE_SEARCH_CX` in Vercel.
-3. Enable the **Custom Search API** on whichever key you point at it.
+`src/lib/boatPhotos.ts` downscales to 1400px and re-encodes as JPEG before
+upload. That also strips EXIF, which matters here: phone photos carry GPS, and
+a boat photo's location is where the boat lives.
 
-Custom Search allows 100 queries/day free, then bills per thousand. Results are
-CDN-cached per model for 30 days and de-duplicated in the browser, so a given
-model costs one query however many boats reference it.
-
-**These are third-party images.** They are hotlinked, not copied, and each
-carries a visible credit linking to its source page, but they are not licensed
-to SlipGo. Before this is a commercial product, either license the imagery, let
-owners upload their own photo, or fall back to the drawn placeholder.
-
-Without a model, without configuration, or when nothing is found, the card
-shows the placeholder from `src/lib/boatArt.ts` — an SVG drawn from the boat's
-real length and rig, never presented as a photograph of the boat.
+Until a photo is uploaded the card shows the drawn placeholder from
+`src/lib/boatArt.ts` — an SVG built from the boat's real length and rig, and
+plainly an illustration rather than a photograph.
 
 ## Map
 
