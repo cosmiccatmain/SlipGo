@@ -86,11 +86,10 @@ export function MapView({ listings, hoveredId, selectedId, selectNonce, onOpen }
     map.setView(HARBOR_CENTER, HARBOR_ZOOM);
     L.control.zoom({ position: "bottomright" }).addTo(map);
     L.tileLayer(
-      "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
       {
-        maxZoom: 17,
-        attribution:
-          '&copy; <a href="https://opentopomap.org">OpenTopoMap</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 18,
+        attribution: "&copy; Tiles &copy; Esri",
       },
     ).addTo(map);
     mapRef.current = map;
