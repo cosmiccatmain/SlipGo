@@ -87,7 +87,7 @@ export function MapView({ listings, hoveredId, selectedId, selectNonce, onOpen }
     map.setView(HARBOR_CENTER, HARBOR_ZOOM);
     L.control.zoom({ position: "bottomright" }).addTo(map);
     L.tileLayer(
-      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+      "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Canvas/MapServer/tile/{z}/{y}/{x}",
       {
         maxZoom: 18,
         minZoom: 0,
