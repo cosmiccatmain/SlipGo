@@ -47,7 +47,14 @@ async function fetchPlace(
       locationBias: { circle: { center: { latitude: lat, longitude: lon }, radius: 4000 } },
     }),
   });
-  if (!searchRes.ok) return null;
+  if (!searchRes.ok) {
+    // Surface *why* Google refused (bad key, referrer-restricted key used
+    // server-side, Places not enabled, billing) — silently returning null here
+    // is what made this impossible to diagnose from the outside.
+    const body = await searchRes.text().catch(() => "");
+    const reason = body.match(/"reason":\s*"([^"]+)"/)?.[1];
+    throw new Error(`Places searchText ${searchRes.status}${reason ? ` — ${reason}` : ""}`);
+  }
   const data = await searchRes.json();
   const place = data?.places?.[0];
   if (!place) return null;
@@ -149,11 +156,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const lon = Number(req.query.lon);
 
   let place: PlaceInfo | null = null;
+  let placesError: string | null = null;
   if (googleKey && name && Number.isFinite(lat) && Number.isFinite(lon)) {
     try {
       place = await fetchPlace(googleKey, name, address, lat, lon);
-    } catch {
+    } catch (err) {
       place = null;
+      placesError = err instanceof Error ? err.message : "unknown error";
     }
   }
 
@@ -166,7 +175,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
   }
 
-  // Cache at the CDN so we don't re-hit the paid APIs on every open.
-  res.setHeader("Cache-Control", "s-maxage=86400, stale-while-revalidate=604800");
-  res.status(200).json({ configured, place, summary });
+  // Cache successes at the CDN so we don't re-hit the paid APIs on every open.
+  // Never cache a failure for a day: a key that gets fixed would otherwise keep
+  // serving "no reviews" from the edge long after the fix landed.
+  res.setHeader(
+    "Cache-Control",
+    placesError ? "s-maxage=60" : "s-maxage=86400, stale-while-revalidate=604800",
+  );
+  res.status(200).json({ configured, place, placesError, summary });
 }
