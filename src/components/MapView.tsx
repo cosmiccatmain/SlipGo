@@ -69,11 +69,11 @@ export function MapView({ listings, hoveredId, selectedId, selectNonce, onOpen }
     const size = map.getSize();
     if (size.x === 0 || size.y === 0) return;
     if (ls.length === 1) {
-      map.setView([ls[0].lat, ls[0].lon], 15);
+      map.flyTo([ls[0].lat, ls[0].lon], 15, { duration: 0.8 });
       return;
     }
     const bounds = L.latLngBounds(ls.map((l) => [l.lat, l.lon] as [number, number]));
-    map.fitBounds(bounds, { padding: [64, 64], maxZoom: 15 });
+    map.flyToBounds(bounds, { padding: [64, 64], maxZoom: 15, duration: 1 });
   }, []);
 
   useEffect(() => {
@@ -81,14 +81,16 @@ export function MapView({ listings, hoveredId, selectedId, selectNonce, onOpen }
     const map = L.map(containerRef.current, {
       zoomControl: false,
       attributionControl: true,
+      zoomAnimation: true,
     });
     map.attributionControl.setPrefix(false);
     map.setView(HARBOR_CENTER, HARBOR_ZOOM);
     L.control.zoom({ position: "bottomright" }).addTo(map);
     L.tileLayer(
-      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map_HighRes/MapServer/tile/{z}/{y}/{x}",
       {
         maxZoom: 18,
+        minZoom: 0,
         attribution: "&copy; Tiles &copy; Esri",
       },
     ).addTo(map);
