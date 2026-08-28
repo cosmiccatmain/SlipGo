@@ -4504,9 +4504,17 @@ img.detail-hero.loaded {
 /* ═══════════════════ Account: avatar, menu, pages ═══════════════════ */
 
 .btn-signup {
+  /* Sits in a flex row with Pricing and Help: without nowrap + no-shrink it
+     gets squeezed, "Sign up" breaks over two lines, and the fixed height
+     turns the pill into a blob. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   align-self: center;
+  flex-shrink: 0;
+  white-space: nowrap;
   height: 36px;
-  padding: 0 16px;
+  padding: 0 18px;
   margin-left: 6px;
   border: none;
   border-radius: 999px;
@@ -4514,6 +4522,7 @@ img.detail-hero.loaded {
   color: #fff;
   font-size: 14px;
   font-weight: 700;
+  line-height: 1;
   font-family: var(--font);
   transition: background 0.14s ease;
 }
