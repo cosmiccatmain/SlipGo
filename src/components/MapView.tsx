@@ -4,6 +4,7 @@ import type { Listing } from "../data/listings";
 import { marinaPhoto } from "../lib/photos";
 import { getEstimate, formatEstimate } from "../lib/estimate";
 import { getCachedPhoto, onEnrichmentReady } from "../lib/enrich";
+import { getGoogleSession, googleTileUrl, hasGoogleKey } from "../lib/googleTiles";
 
 const HARBOR_CENTER: [number, number] = [33.9762, -118.4505];
 const HARBOR_ZOOM = 15;
@@ -86,7 +87,9 @@ export function MapView({ listings, hoveredId, selectedId, selectNonce, onOpen }
     map.attributionControl.setPrefix(false);
     map.setView(HARBOR_CENTER, HARBOR_ZOOM);
     L.control.zoom({ position: "bottomright" }).addTo(map);
-    L.tileLayer(
+    // Esri's light canvas paints immediately and keeps the map usable if the
+    // Google session can't be minted (no key, quota, offline).
+    const fallback = L.tileLayer(
       "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Canvas/MapServer/tile/{z}/{y}/{x}",
       {
         maxZoom: 18,
@@ -94,6 +97,23 @@ export function MapView({ listings, hoveredId, selectedId, selectNonce, onOpen }
         attribution: "&copy; Tiles &copy; Esri",
       },
     ).addTo(map);
+
+    let cancelled = false;
+    if (hasGoogleKey()) {
+      getGoogleSession().then((session) => {
+        if (cancelled || !session || !mapRef.current) return;
+        const google = L.tileLayer(googleTileUrl(session), {
+          maxZoom: 20,
+          minZoom: 0,
+          // Tiles come back at 512px for a 256px slot (scaleFactor2x).
+          tileSize: 256,
+          attribution: "&copy; Google",
+        }).addTo(map);
+        // Only drop the fallback once Google has painted, so there's no flash
+        // of empty grey between the two layers.
+        google.once("load", () => map.removeLayer(fallback));
+      });
+    }
     mapRef.current = map;
 
     // The container can be 0x0 on first paint / when hidden behind the mobile
@@ -110,6 +130,7 @@ export function MapView({ listings, hoveredId, selectedId, selectNonce, onOpen }
     ro.observe(containerRef.current);
 
     return () => {
+      cancelled = true;
       ro.disconnect();
       map.remove();
       mapRef.current = null;

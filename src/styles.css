@@ -957,6 +957,40 @@ button {
 
 .leaflet-container {
   font-family: var(--font);
+  /* Matches the tiles' paper tone, so pans and zooms never flash grey. */
+  background: #f7f9fb;
+}
+
+/* Keep the attribution as a quiet footnote rather than Leaflet's grey bar. */
+.leaflet-control-attribution {
+  background: rgba(255, 255, 255, 0.82) !important;
+  backdrop-filter: blur(4px);
+  border-radius: 6px 0 0 0;
+  padding: 2px 8px !important;
+  font-size: 10.5px !important;
+  color: var(--faint) !important;
+}
+
+.leaflet-control-attribution a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.leaflet-control-zoom {
+  border: 1px solid var(--border-light) !important;
+  border-radius: 8px !important;
+  box-shadow: var(--shadow-card) !important;
+  overflow: hidden;
+}
+
+.leaflet-control-zoom a {
+  color: var(--text) !important;
+  border-bottom-color: var(--border-light) !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: var(--blue-tint) !important;
+  color: var(--blue) !important;
 }
 
 /* ───────────────────── Listings panel ───────────────────── */
