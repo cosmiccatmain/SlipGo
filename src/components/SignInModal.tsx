@@ -73,7 +73,7 @@ export function SignInModal({ open, onClose }: Props) {
             {mode === "signup" ? "Create your account" : "Welcome back"}
           </div>
           <div className="modal-sub">
-            Save searches, favorite slips, and plan Trips across California.
+            Save searches, favorite slips, and plan Trips coast to coast.
           </div>
         </div>
 

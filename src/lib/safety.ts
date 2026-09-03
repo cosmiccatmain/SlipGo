@@ -3,13 +3,15 @@ import type { Listing } from "../data/listings";
 import { REGIONS } from "../data/regions";
 
 // ── Safety / crime rating ─────────────────────────────────────────────────────
-// Real data: FBI Crime Data Explorer (UCR) statewide estimates for California,
+// Real data: FBI Crime Data Explorer (UCR) statewide estimates for the state a
+// harbor actually sits in — the endpoint is keyed by state code, so a DC marina
+// is scored on DC's numbers and a Seattle one on Washington's,
 // fetched keyless via api.usa.gov's public DEMO_KEY — same access model as the
 // wind data (no secret to hide, called directly from the browser; CORS is open
 // since the FBI's own web explorer is a browser client of this same endpoint).
 //
 // This is a STATEWIDE trend, not a per-harbor figure: no free, nationally
-// consistent API reports crime at harbor-patrol granularity across the ~30
+// consistent API reports crime at harbor-patrol granularity across the
 // agencies in REGIONS (city PDs, county sheriffs, harbor patrols each run
 // their own systems), so the UI says so plainly rather than implying local
 // precision. `source`/`note` reflect that honestly. Swap in a real per-harbor
@@ -28,7 +30,8 @@ export interface SafetyInfo {
 // Get a free key at https://api.data.gov/signup and set VITE_FBI_CRIME_API_KEY
 // to raise the limit before relying on this under real traffic.
 const FBI_API_KEY = import.meta.env.VITE_FBI_CRIME_API_KEY || "DEMO_KEY";
-const FBI_ESTIMATES_URL = `https://api.usa.gov/crime/nibrs/v1/estimates/states/CA?api_key=${FBI_API_KEY}`;
+const estimatesUrl = (stateCode: string) =>
+  `https://api.usa.gov/crime/nibrs/v1/estimates/states/${stateCode}?api_key=${FBI_API_KEY}`;
 
 export function scoreToGrade(score: number): string {
   if (score >= 90) return "A";
@@ -52,16 +55,22 @@ interface StatewideResult {
   year: number;
 }
 
+// Cached per state: listings now span many states, so one global slot would
+// hand a Florida marina whichever state happened to load first.
 // undefined = not fetched yet, null = fetch failed/unavailable
-let cached: StatewideResult | null | undefined;
-let inflight: Promise<StatewideResult | null> | null = null;
+const cache = new Map<string, StatewideResult | null>();
+const inflight = new Map<string, Promise<StatewideResult | null>>();
 
-async function loadStatewide(): Promise<StatewideResult | null> {
-  if (cached !== undefined) return cached;
-  if (inflight) return inflight;
-  inflight = (async () => {
+async function loadStatewide(stateCode: string): Promise<StatewideResult | null> {
+  const hit = cache.get(stateCode);
+  if (hit !== undefined) return hit;
+  const pending = inflight.get(stateCode);
+  if (pending) return pending;
+
+  const req = (async () => {
+    let cached: StatewideResult | null = null;
     try {
-      const res = await fetch(FBI_ESTIMATES_URL);
+      const res = await fetch(estimatesUrl(stateCode));
       if (!res.ok) {
         cached = null;
         return cached;
@@ -87,25 +96,33 @@ async function loadStatewide(): Promise<StatewideResult | null> {
       cached = null;
       return cached;
     } finally {
-      inflight = null;
+      cache.set(stateCode, cached);
+      inflight.delete(stateCode);
     }
   })();
-  return inflight;
+
+  inflight.set(stateCode, req);
+  return req;
 }
 
 export function useSafety(listing: Listing): SafetyInfo {
-  const source = REGIONS[listing.region].safetySource;
-  const [state, setState] = useState<StatewideResult | null | undefined>(cached);
+  const region = REGIONS[listing.region];
+  const source = region.safetySource;
+  const stateCode = region.state;
+  const [state, setState] = useState<StatewideResult | null | undefined>(() =>
+    cache.get(stateCode),
+  );
 
   useEffect(() => {
     let alive = true;
-    loadStatewide().then((r) => {
+    setState(cache.get(stateCode));
+    loadStatewide(stateCode).then((r) => {
       if (alive) setState(r);
     });
     return () => {
       alive = false;
     };
-  }, []);
+  }, [stateCode]);
 
   if (!state) {
     return {
@@ -121,7 +138,7 @@ export function useSafety(listing: Listing): SafetyInfo {
     ready: true,
     score: state.score,
     grade: state.grade,
-    source: `FBI Crime Data Explorer — California statewide, ${state.year}`,
+    source: `FBI Crime Data Explorer — ${stateCode} statewide, ${state.year}`,
     note: `Statewide trend from FBI UCR data, not specific to ${source}'s beat — a per-harbor feed is next.`,
   };
 }

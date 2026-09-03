@@ -120,7 +120,7 @@ export function FilterBar({ filters, onChange, query, onQueryChange, mode, onToa
         <input
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
-          placeholder="Marina del Rey, Long Beach, Newport…"
+          placeholder="Marina del Rey, Annapolis, Seattle…"
           aria-label="Search marinas"
         />
         {query ? (

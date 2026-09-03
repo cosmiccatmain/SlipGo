@@ -11,7 +11,7 @@ export function EventsView() {
           SlipGo <span className="events-script">Events</span>
         </h1>
         <p>
-          Parades, races and festivals across California harbors — plan a
+          Parades, races and festivals across the harbors we cover — plan a
           slip around the ones worth showing up for.
         </p>
       </header>

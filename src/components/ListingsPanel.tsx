@@ -43,8 +43,8 @@ export function ListingsPanel({ listings, mode, sort, onSortChange, selectedId, 
   }, [selectedId]);
 
   const heading = mode === "sale"
-    ? "California Boat Slips for Sale"
-    : "California Boat Slips & Marinas";
+    ? "Boat Slips for Sale"
+    : "Boat Slips & Marinas";
 
   return (
     <section className="listings-panel" ref={panelRef}>
@@ -99,7 +99,7 @@ export function ListingsPanel({ listings, mode, sort, onSortChange, selectedId, 
       )}
 
       <footer className="panel-footer">
-        SlipGo — find your slip, anywhere in California. Listings, pricing,
+        SlipGo — find your slip, coast to coast. Listings, pricing,
         ratings, and the SlipGo Estimate are illustrative MVP sample data — not a
         real appraisal. Map © OpenStreetMap contributors.
       </footer>

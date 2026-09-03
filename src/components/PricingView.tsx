@@ -1,6 +1,7 @@
 import { useAuth } from "../lib/auth";
 import { TIER_RANK, type Tier } from "../lib/membership";
 import { COMPARISON, PLANS, planLabel, type Plan } from "../lib/plans";
+import { allListings } from "../data/listings";
 
 interface Props {
   onToast: (msg: string) => void;
@@ -52,7 +53,7 @@ export function PricingView({ onToast }: Props) {
         <span className="pricing-eyebrow">Plans</span>
         <h1>Find your slip. Then plan the whole season.</h1>
         <p>
-          Every plan searches all 99 California listings. Upgrade when you want the
+          Every plan searches all {allListings.length} listings. Upgrade when you want the
           detail behind a slip, or the routes between them.
         </p>
         <p className="pricing-billing-note">

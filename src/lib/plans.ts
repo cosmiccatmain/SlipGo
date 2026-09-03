@@ -1,3 +1,4 @@
+import { allListings } from "../data/listings";
 import { BOAT_LIMIT } from "./boats";
 import { FEATURE_TIER, type Tier } from "./membership";
 
@@ -6,6 +7,9 @@ import { FEATURE_TIER, type Tier } from "./membership";
 // and perks are exactly the ones the project already carried — nothing here is
 // invented, and only monthly billing exists today, so no annual toggle is
 // offered until real billing periods are configured.
+
+/** Kept in one place so plan copy can never drift from the catalogue. */
+const LISTING_COUNT = allListings.length;
 
 export interface Plan {
   tier: Tier;
@@ -27,10 +31,10 @@ export const PLANS: Plan[] = [
     name: "Free",
     price: "$0",
     cadence: "forever",
-    blurb: "Search every slip in California.",
+    blurb: "Search every slip we cover.",
     audience: "Browsing the coast and comparing what a slip should cost.",
     perks: [
-      "All 99 listings & the map",
+      `All ${LISTING_COUNT} listings & the map`,
       "SlipGo Estimate",
       "Skipper AI summaries",
       "Live wind",
@@ -133,7 +137,7 @@ export const COMPARISON: ComparisonRow[] = [
   },
   {
     label: "Custom multi-stop trips",
-    detail: "Chain any harbours in California into your own route.",
+    detail: "Chain any harbours we cover into your own route.",
     values: byFeature("tripsCustom"),
   },
   {

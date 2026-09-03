@@ -173,7 +173,7 @@ function TripsHeader({ tier }: { tier: Tier }) {
         SlipGo <span className="trips-green">Trips</span>
       </h1>
       <p>
-        Cruise California with a slip waiting at every stop. Legs are timed against{" "}
+        Cruise with a slip waiting at every stop. Legs are timed against{" "}
         <b>live wind</b> and your boat's cruise speed.
       </p>
       {tier !== "free" && (
@@ -837,7 +837,7 @@ function CustomTripBuilder({
         <div>
           <h3>Build your own trip</h3>
           <p className="trip-tagline">
-            Chain any harbours in California — we'll time it against live wind and
+            Chain any harbours we cover — we'll time it against live wind and
             price every night.
           </p>
         </div>
@@ -893,7 +893,7 @@ function CustomTripBuilder({
           variant="inline"
           tier="pro"
           title="Build your own route"
-          body="SlipGo Pro lets you chain any harbours in California into one route, timed against live wind and priced night by night."
+          body="SlipGo Pro lets you chain any harbours we cover into one route, timed against live wind and priced night by night."
           ctaLabel="Unlock with Pro"
           onUnlock={onPricing}
           onComparePlans={onPricing}
