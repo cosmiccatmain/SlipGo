@@ -14,6 +14,7 @@ import { BoatsView } from "./components/BoatsView";
 import { SettingsView, BillingView } from "./components/AccountViews";
 import { useAuth } from "./lib/auth";
 import { allListings, rentListings, saleListings, type ListingType, type ListingMode } from "./data/listings";
+import { regionSearchText } from "./data/regions";
 
 const ALL_TYPES: ListingType[] = ["marina", "guest-dock", "yacht-club"];
 
@@ -106,7 +107,13 @@ export default function App() {
       if (filters.amenities.size > 0) {
         for (const a of filters.amenities) if (!l.amenities.includes(a)) return false;
       }
-      if (q && !(`${l.name} ${l.address} ${l.neighborhood}`.toLowerCase().includes(q))) return false;
+      if (
+        q &&
+        !`${l.name} ${l.address} ${l.neighborhood} ${regionSearchText(l.region)}`
+          .toLowerCase()
+          .includes(q)
+      )
+        return false;
       return true;
     });
     if (sort === "price-asc") filtered.sort((a, b) => a.sortPrice - b.sortPrice);

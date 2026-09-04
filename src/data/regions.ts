@@ -27,7 +27,9 @@ export interface RegionInfo {
     | "Gulf Coast"
     | "Great Lakes"
     | "Pacific Northwest"
-    | "Inland Lakes";
+    | "Inland Lakes"
+    | "Alaska"
+    | "Hawaii";
   hub: { lat: number; lon: number };
   mouth: { lat: number; lon: number };
   /** Real agency that polices the water here — the future crime-data source. */
@@ -555,6 +557,327 @@ export const REGIONS = {
     mouth: { lat: 30.3905, lon: -97.9075 },
     safetySource: "Travis County Sheriff — Lake Patrol",
   },
+  // ── Northeast (cont.) ─────────────────────────────────────────────────────
+  "portland-me": {
+    label: "Portland",
+    state: "ME",
+    area: "Northeast",
+    hub: { lat: 43.6555, lon: -70.2475 },
+    mouth: { lat: 43.6285, lon: -70.2185 },
+    safetySource: "Portland Harbormaster · Portland PD",
+  },
+  "camden-me": {
+    label: "Camden & Rockport",
+    state: "ME",
+    area: "Northeast",
+    hub: { lat: 44.2095, lon: -69.0625 },
+    mouth: { lat: 44.1995, lon: -69.0455 },
+    safetySource: "Camden Harbormaster · Knox County Sheriff",
+  },
+  "portsmouth-nh": {
+    label: "Portsmouth",
+    state: "NH",
+    area: "Northeast",
+    hub: { lat: 43.0715, lon: -70.7345 },
+    mouth: { lat: 43.0605, lon: -70.7095 },
+    safetySource: "NH Marine Patrol · Portsmouth PD",
+  },
+  "mystic-ct": {
+    label: "Mystic",
+    state: "CT",
+    area: "Northeast",
+    hub: { lat: 41.3535, lon: -71.9665 },
+    mouth: { lat: 41.3245, lon: -71.9645 },
+    safetySource: "Connecticut DEEP — Marine Patrol",
+  },
+  "greenwich-ct": {
+    label: "Greenwich & Stamford",
+    state: "CT",
+    area: "Northeast",
+    hub: { lat: 41.0155, lon: -73.5915 },
+    mouth: { lat: 40.9985, lon: -73.5845 },
+    safetySource: "Greenwich Police — Marine Section",
+  },
+  "montauk-ny": {
+    label: "Montauk",
+    state: "NY",
+    area: "Northeast",
+    hub: { lat: 41.0715, lon: -71.9385 },
+    mouth: { lat: 41.0725, lon: -71.9375 },
+    safetySource: "East Hampton Town Marine Patrol",
+  },
+  "sag-harbor-ny": {
+    label: "Sag Harbor",
+    state: "NY",
+    area: "Northeast",
+    hub: { lat: 41.0005, lon: -72.2925 },
+    mouth: { lat: 41.0155, lon: -72.2895 },
+    safetySource: "Southampton Town Bay Constables",
+  },
+  "atlantic-city-nj": {
+    label: "Atlantic City",
+    state: "NJ",
+    area: "Northeast",
+    hub: { lat: 39.3785, lon: -74.4245 },
+    mouth: { lat: 39.3555, lon: -74.4165 },
+    safetySource: "New Jersey State Police — Marine Services",
+  },
+  "cape-may-nj": {
+    label: "Cape May",
+    state: "NJ",
+    area: "Northeast",
+    hub: { lat: 38.9445, lon: -74.8985 },
+    mouth: { lat: 38.9345, lon: -74.9605 },
+    safetySource: "Cape May County Sheriff — Marine Unit",
+  },
+
+  // ── Chesapeake & Potomac (cont.) ──────────────────────────────────────────
+  "solomons-md": {
+    label: "Solomons Island",
+    state: "MD",
+    area: "Chesapeake & Potomac",
+    hub: { lat: 38.3315, lon: -76.4585 },
+    mouth: { lat: 38.3175, lon: -76.4405 },
+    safetySource: "Maryland Natural Resources Police",
+  },
+  "st-michaels-md": {
+    label: "St. Michaels",
+    state: "MD",
+    area: "Chesapeake & Potomac",
+    hub: { lat: 38.7855, lon: -76.2235 },
+    mouth: { lat: 38.7795, lon: -76.2355 },
+    safetySource: "Talbot County Sheriff · MD NRP",
+  },
+  "rock-hall-md": {
+    label: "Rock Hall",
+    state: "MD",
+    area: "Chesapeake & Potomac",
+    hub: { lat: 39.1385, lon: -76.2475 },
+    mouth: { lat: 39.1425, lon: -76.2565 },
+    safetySource: "Kent County Sheriff · MD NRP",
+  },
+  "norfolk-va": {
+    label: "Norfolk & Hampton Roads",
+    state: "VA",
+    area: "Chesapeake & Potomac",
+    hub: { lat: 36.8465, lon: -76.2925 },
+    mouth: { lat: 36.9455, lon: -76.3315 },
+    safetySource: "Norfolk Police — Marine Patrol",
+  },
+
+  // ── Southeast (cont.) ─────────────────────────────────────────────────────
+  "wilmington-nc": {
+    label: "Wilmington",
+    state: "NC",
+    area: "Southeast",
+    hub: { lat: 34.2385, lon: -77.9525 },
+    mouth: { lat: 33.9285, lon: -78.0195 },
+    safetySource: "Wilmington Police · NC Wildlife Resources",
+  },
+  "beaufort-nc": {
+    label: "Beaufort",
+    state: "NC",
+    area: "Southeast",
+    hub: { lat: 34.7175, lon: -76.6635 },
+    mouth: { lat: 34.6905, lon: -76.6795 },
+    safetySource: "Carteret County Sheriff — Marine Unit",
+  },
+  "savannah-ga": {
+    label: "Savannah",
+    state: "GA",
+    area: "Southeast",
+    hub: { lat: 31.9805, lon: -81.0555 },
+    mouth: { lat: 32.0315, lon: -80.8845 },
+    safetySource: "Chatham County Marine Patrol",
+  },
+  "st-petersburg-fl": {
+    label: "St. Petersburg",
+    state: "FL",
+    area: "Southeast",
+    hub: { lat: 27.7695, lon: -82.6295 },
+    mouth: { lat: 27.7195, lon: -82.6255 },
+    safetySource: "St. Petersburg Police — Marine Unit",
+  },
+  "naples-fl": {
+    label: "Naples",
+    state: "FL",
+    area: "Southeast",
+    hub: { lat: 26.1315, lon: -81.7925 },
+    mouth: { lat: 26.1305, lon: -81.8135 },
+    safetySource: "Naples Police · Collier County Marine Unit",
+  },
+  "stuart-fl": {
+    label: "Stuart",
+    state: "FL",
+    area: "Southeast",
+    hub: { lat: 27.1965, lon: -80.2535 },
+    mouth: { lat: 27.1685, lon: -80.1615 },
+    safetySource: "Martin County Sheriff — Marine Unit",
+  },
+  "marathon-fl": {
+    label: "Marathon",
+    state: "FL",
+    area: "Southeast",
+    hub: { lat: 24.7095, lon: -81.0945 },
+    mouth: { lat: 24.6985, lon: -81.0885 },
+    safetySource: "Monroe County Sheriff · Florida FWC",
+  },
+
+  // ── Gulf Coast (cont.) ────────────────────────────────────────────────────
+  "orange-beach-al": {
+    label: "Orange Beach",
+    state: "AL",
+    area: "Gulf Coast",
+    hub: { lat: 30.2915, lon: -87.6605 },
+    mouth: { lat: 30.2735, lon: -87.5615 },
+    safetySource: "Orange Beach Police — Marine Unit",
+  },
+  "biloxi-ms": {
+    label: "Biloxi",
+    state: "MS",
+    area: "Gulf Coast",
+    hub: { lat: 30.3925, lon: -88.8595 },
+    mouth: { lat: 30.3785, lon: -88.8565 },
+    safetySource: "Mississippi DMR — Marine Patrol",
+  },
+  "corpus-christi-tx": {
+    label: "Corpus Christi",
+    state: "TX",
+    area: "Gulf Coast",
+    hub: { lat: 27.7955, lon: -97.3895 },
+    mouth: { lat: 27.8175, lon: -97.3855 },
+    safetySource: "Corpus Christi Police — Marine Unit",
+  },
+  "port-aransas-tx": {
+    label: "Port Aransas",
+    state: "TX",
+    area: "Gulf Coast",
+    hub: { lat: 27.8285, lon: -97.0725 },
+    mouth: { lat: 27.8395, lon: -97.0505 },
+    safetySource: "Texas Parks & Wildlife — Game Wardens",
+  },
+
+  // ── Great Lakes (cont.) ───────────────────────────────────────────────────
+  "cleveland-oh": {
+    label: "Cleveland",
+    state: "OH",
+    area: "Great Lakes",
+    hub: { lat: 41.5015, lon: -81.7095 },
+    mouth: { lat: 41.5115, lon: -81.7135 },
+    safetySource: "Cleveland Police — Marine Unit",
+  },
+  "traverse-city-mi": {
+    label: "Traverse City",
+    state: "MI",
+    area: "Great Lakes",
+    hub: { lat: 44.7695, lon: -85.6195 },
+    mouth: { lat: 44.7855, lon: -85.6045 },
+    safetySource: "Grand Traverse County Sheriff — Marine Division",
+  },
+  "sandusky-oh": {
+    label: "Sandusky & Lake Erie Islands",
+    state: "OH",
+    area: "Great Lakes",
+    hub: { lat: 41.4595, lon: -82.7095 },
+    mouth: { lat: 41.4815, lon: -82.7195 },
+    safetySource: "Ohio DNR — Watercraft Division",
+  },
+  "erie-pa": {
+    label: "Erie",
+    state: "PA",
+    area: "Great Lakes",
+    hub: { lat: 42.1385, lon: -80.0895 },
+    mouth: { lat: 42.1585, lon: -80.1155 },
+    safetySource: "Pennsylvania Fish & Boat Commission",
+  },
+  "duluth-mn": {
+    label: "Duluth & Lake Superior",
+    state: "MN",
+    area: "Great Lakes",
+    hub: { lat: 46.7565, lon: -92.0895 },
+    mouth: { lat: 46.7755, lon: -92.0925 },
+    safetySource: "St. Louis County Sheriff — Rescue Squad",
+  },
+
+  // ── Pacific Northwest (cont.) ─────────────────────────────────────────────
+  "tacoma-wa": {
+    label: "Tacoma",
+    state: "WA",
+    area: "Pacific Northwest",
+    hub: { lat: 47.2665, lon: -122.4145 },
+    mouth: { lat: 47.2915, lon: -122.4405 },
+    safetySource: "Tacoma Police — Marine Services",
+  },
+  "friday-harbor-wa": {
+    label: "Friday Harbor",
+    state: "WA",
+    area: "Pacific Northwest",
+    hub: { lat: 48.5365, lon: -123.0135 },
+    mouth: { lat: 48.5405, lon: -123.0055 },
+    safetySource: "San Juan County Sheriff — Marine Patrol",
+  },
+  "astoria-or": {
+    label: "Astoria",
+    state: "OR",
+    area: "Pacific Northwest",
+    hub: { lat: 46.1905, lon: -123.8245 },
+    mouth: { lat: 46.2385, lon: -123.9705 },
+    safetySource: "Clatsop County Sheriff — Marine Patrol",
+  },
+
+  // ── Alaska ────────────────────────────────────────────────────────────────
+  "juneau-ak": {
+    label: "Juneau",
+    state: "AK",
+    area: "Alaska",
+    hub: { lat: 58.3025, lon: -134.4115 },
+    mouth: { lat: 58.2895, lon: -134.4055 },
+    safetySource: "Juneau Police · U.S. Coast Guard Sector Juneau",
+  },
+  "homer-ak": {
+    label: "Homer",
+    state: "AK",
+    area: "Alaska",
+    hub: { lat: 59.6015, lon: -151.4145 },
+    mouth: { lat: 59.6035, lon: -151.4235 },
+    safetySource: "Homer Harbormaster · Alaska State Troopers",
+  },
+
+  // ── Hawaii ────────────────────────────────────────────────────────────────
+  "honolulu-hi": {
+    label: "Honolulu",
+    state: "HI",
+    area: "Hawaii",
+    hub: { lat: 21.2865, lon: -157.8425 },
+    mouth: { lat: 21.2795, lon: -157.8455 },
+    safetySource: "Hawaii DLNR — Division of Boating & Ocean Recreation",
+  },
+  "maui-hi": {
+    label: "Maui",
+    state: "HI",
+    area: "Hawaii",
+    hub: { lat: 20.7915, lon: -156.5095 },
+    mouth: { lat: 20.7885, lon: -156.5115 },
+    safetySource: "Hawaii DLNR — Division of Boating & Ocean Recreation",
+  },
+
+  // ── Inland lakes (cont.) ──────────────────────────────────────────────────
+  "lake-powell-az": {
+    label: "Lake Powell",
+    state: "AZ",
+    area: "Inland Lakes",
+    hub: { lat: 36.9985, lon: -111.4885 },
+    mouth: { lat: 36.9375, lon: -111.4835 },
+    safetySource: "NPS — Glen Canyon National Recreation Area Rangers",
+  },
+  "lake-norman-nc": {
+    label: "Lake Norman",
+    state: "NC",
+    area: "Inland Lakes",
+    hub: { lat: 35.4885, lon: -80.9345 },
+    mouth: { lat: 35.4295, lon: -80.9515 },
+    safetySource: "NC Wildlife Resources Commission",
+  },
 } as const satisfies Record<string, RegionInfo>;
 
 export type Region = keyof typeof REGIONS;
@@ -563,4 +886,26 @@ export const REGION_KEYS = Object.keys(REGIONS) as Region[];
 
 export function regionInfo(r: Region): RegionInfo {
   return REGIONS[r];
+}
+
+// ── Search text ──────────────────────────────────────────────────────────────
+// Listings are searched by name/address/neighbourhood, none of which spell the
+// state out: an address reads "Juneau, AK 99801", so a boater typing "Alaska"
+// found nothing. Region label + state name + code join the haystack.
+
+const STATE_NAMES: Record<string, string> = {
+  AK: "Alaska", AL: "Alabama", AZ: "Arizona", CA: "California", CT: "Connecticut",
+  DC: "Washington DC District of Columbia", FL: "Florida", GA: "Georgia",
+  HI: "Hawaii", IL: "Illinois", LA: "Louisiana", MA: "Massachusetts",
+  MD: "Maryland", ME: "Maine", MI: "Michigan", MN: "Minnesota", MS: "Mississippi",
+  NC: "North Carolina", NH: "New Hampshire", NJ: "New Jersey", NY: "New York",
+  OH: "Ohio", OR: "Oregon", PA: "Pennsylvania", RI: "Rhode Island",
+  SC: "South Carolina", TX: "Texas", VA: "Virginia", WA: "Washington",
+  WI: "Wisconsin",
+};
+
+/** Extra terms a listing in this region should match on. */
+export function regionSearchText(r: Region): string {
+  const info = REGIONS[r];
+  return `${info.label} ${info.state} ${STATE_NAMES[info.state] ?? ""}`;
 }
